@@ -118,42 +118,41 @@ ALTER TABLE [cw].[QrUserClients] CHECK CONSTRAINT [FK_cw.QrUserClients_cw.Compan
 GO
 /**/
 
-
-
 CREATE PROCEDURE [cw].[GetQrData]
     @CompanyId INT = NULL,
-    @BusinessQrId INT = NULL,
-    @BranchQrId INT = NULL,
-    @QrUserId INT = NULL
+    @BusinessQRPaymentId INT = NULL,
+    @BranchQRPaymentId INT = NULL,
+    @QrCompanyId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    IF @CompanyId IS NOT NULL
-    BEGIN
-        SELECT *
-        FROM [cw].[businesssQr]
-        WHERE [CompanyId] = @CompanyId;
-    END
-
-    IF @BusinessQrId IS NOT NULL
-    BEGIN
-        SELECT *
-        FROM [cw].[BranchQr]
-        WHERE [BusinessQrId] = @BusinessQrId;
-    END
-
-    IF @BranchQrId IS NOT NULL
-    BEGIN
-        SELECT *
-        FROM [cw].[AtmQR]
-        WHERE [BranchQrId] = @BranchQrId;
-    END
-
-    IF @QrUserId IS NOT NULL
-    BEGIN
-        SELECT *
-        FROM [cw].[QrUserClients]
-        WHERE [QrUserId] = @QrUserId;
-    END
+IF @CompanyId IS NOT NULL
+BEGIN
+    SELECT *
+    FROM [cw].[BusinessQRPayments]
+    WHERE [CompanyId] = @CompanyId;
 END
+
+IF @BusinessQRPaymentId IS NOT NULL
+BEGIN
+    SELECT *
+    FROM [cw].[BranchQRPayments]
+    WHERE [BusinessQRPaymentId] = @BusinessQRPaymentId;
+END
+
+IF @BranchQRPaymentId IS NOT NULL
+BEGIN
+    SELECT *
+    FROM [cw].[AtmQRPayments]
+    WHERE [BranchQRPaymentId] = @BranchQRPaymentId;
+END
+
+IF @QrCompanyId IS NOT NULL
+BEGIN
+    SELECT *
+    FROM [cw].[QrUserClients]
+    WHERE [CompanyId] = @QrCompanyId;
+END
+END
+
+
