@@ -62,3 +62,57 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjRiMjU1NWYtYzY2Zi00OWViLWJkMDAtNGJjNDRiMmQ4MDRj%40thread.v2/0?context=%7b%22Tid%22%3a%225d93ebcc-f769-4380-8b7e-289fc972da1b%22%2c%22Oid%22%3a%22cdf5bb63-a813-4e98-bcd5-f99562ceac13%22%7d
+
+
+USE [BD_CREDINET]
+GO
+
+/****** Object:  Table [cw].[QrUserClients]    Script Date: 4/22/2023 2:01:09 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [cw].[QrUserClients](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[CompanyId] [int] NOT NULL,
+	[BachAtmId] [int] NOT NULL,
+	[QrUserId] [int] NOT NULL,
+	[RoleCode] [nvarchar](10) NULL,
+	[UserType] [nvarchar](60) NULL,
+	[Name] [nvarchar](250) NULL,
+	[UserName] [nvarchar](100) NULL,
+	[Token] [nvarchar](250) NULL,
+	[Password] [nvarchar](250) NULL,
+	[Email] [nvarchar](4000) NULL,
+	[Cellphone] [nvarchar](4000) NULL,
+	[DocumentNumber] [nvarchar](4000) NULL,
+	[DocumentType] [nvarchar](60) NULL,
+	[DocumentExtension] [nvarchar](60) NULL,
+	[DocumentComplement] [nvarchar](100) NULL,
+	[UserCreation] [nvarchar](6) NOT NULL,
+	[UserModification] [nvarchar](6) NULL,
+	[DateCreation] [datetime] NOT NULL,
+	[DateModification] [datetime] NULL,
+	[PasswordExpirationDate] [datetime] NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+ CONSTRAINT [PK_cw.QrUserClients] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [cw].[QrUserClients] ADD  DEFAULT ((0)) FOR [CompanyId]
+GO
+
+ALTER TABLE [cw].[QrUserClients] ADD  DEFAULT ((0)) FOR [BachAtmId]
+GO
+
+ALTER TABLE [cw].[QrUserClients]  WITH CHECK ADD  CONSTRAINT [FK_cw.QrUserClients_cw.Companies_CompanyId] FOREIGN KEY([CompanyId])
+REFERENCES [cw].[Companies] ([Id])
+GO
+
+ALTER TABLE [cw].[QrUserClients] CHECK CONSTRAINT [FK_cw.QrUserClients_cw.Companies_CompanyId]
+GO
