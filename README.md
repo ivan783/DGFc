@@ -116,3 +116,44 @@ GO
 
 ALTER TABLE [cw].[QrUserClients] CHECK CONSTRAINT [FK_cw.QrUserClients_cw.Companies_CompanyId]
 GO
+/**/
+
+
+
+CREATE PROCEDURE [cw].[GetQrData]
+    @CompanyId INT = NULL,
+    @BusinessQrId INT = NULL,
+    @BranchQrId INT = NULL,
+    @QrUserId INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @CompanyId IS NOT NULL
+    BEGIN
+        SELECT *
+        FROM [cw].[businesssQr]
+        WHERE [CompanyId] = @CompanyId;
+    END
+
+    IF @BusinessQrId IS NOT NULL
+    BEGIN
+        SELECT *
+        FROM [cw].[BranchQr]
+        WHERE [BusinessQrId] = @BusinessQrId;
+    END
+
+    IF @BranchQrId IS NOT NULL
+    BEGIN
+        SELECT *
+        FROM [cw].[AtmQR]
+        WHERE [BranchQrId] = @BranchQrId;
+    END
+
+    IF @QrUserId IS NOT NULL
+    BEGIN
+        SELECT *
+        FROM [cw].[QrUserClients]
+        WHERE [QrUserId] = @QrUserId;
+    END
+END
