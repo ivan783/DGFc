@@ -462,3 +462,49 @@ public Result<List<ResponseUsersAll>> GetUserQR(BusinesBranchId businessId, stri
     @DateModification DATETIME,
     @PasswordExpirationDate DATETIME,
     @IsDeleted BIT
+	
+	
+	
+	using System.Data;
+using System.Data.SqlClient;
+
+public void InsertarRegistro(string option, int? id, int companyId, int bachAtmId, int qrUserId, string roleCode, string userType, string name, string userName, string token, string password, string email, string cellphone, string documentNumber, string documentType, string documentExtension, string documentComplement, string userCreation, string userModification, DateTime dateCreation, DateTime dateModification, DateTime passwordExpirationDate, bool isDeleted)
+{
+    using (SqlConnection connection = new SqlConnection("cadena de conexión a la base de datos"))
+    {
+        connection.Open();
+
+        using (SqlCommand command = new SqlCommand("nombre_del_stored_procedure", connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+
+            // Parámetros del stored procedure
+            command.Parameters.AddWithValue("@Option", option);
+            command.Parameters.AddWithValue("@Id", id.HasValue ? (object)id.Value : DBNull.Value);
+            command.Parameters.AddWithValue("@CompanyId", companyId);
+            command.Parameters.AddWithValue("@BachAtmId", bachAtmId);
+            command.Parameters.AddWithValue("@QrUserId", qrUserId);
+            command.Parameters.AddWithValue("@RoleCode", roleCode);
+            command.Parameters.AddWithValue("@UserType", userType);
+            command.Parameters.AddWithValue("@Name", name);
+            command.Parameters.AddWithValue("@UserName", userName);
+            command.Parameters.AddWithValue("@Token", token);
+            command.Parameters.AddWithValue("@Password", password);
+            command.Parameters.AddWithValue("@Email", email);
+            command.Parameters.AddWithValue("@Cellphone", cellphone);
+            command.Parameters.AddWithValue("@DocumentNumber", documentNumber);
+            command.Parameters.AddWithValue("@DocumentType", documentType);
+            command.Parameters.AddWithValue("@DocumentExtension", documentExtension);
+            command.Parameters.AddWithValue("@DocumentComplement", documentComplement);
+            command.Parameters.AddWithValue("@UserCreation", userCreation);
+            command.Parameters.AddWithValue("@UserModification", userModification);
+            command.Parameters.AddWithValue("@DateCreation", dateCreation);
+            command.Parameters.AddWithValue("@DateModification", dateModification);
+            command.Parameters.AddWithValue("@PasswordExpirationDate", passwordExpirationDate);
+            command.Parameters.AddWithValue("@IsDeleted", isDeleted);
+
+            command.ExecuteNonQuery();
+        }
+    }
+}
+
