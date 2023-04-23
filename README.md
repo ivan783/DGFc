@@ -156,3 +156,115 @@ END
 END
 
 
+
+
+public Result<List<ResponseUsersAll>> GetUserQRAll(BusinesBranchId businessId)
+        {
+            List<ResponseUsersAll> response = new List<ResponseUsersAll>();
+            //var listBranches = Context.BranchQRPayments.Where(x => x.BusinessQRPaymentId == businessId.businessId).ToList();
+            try
+            {
+
+                var listUsers = Context.SqlQuery<QrUserClient>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+                    new SqlParameter[]{
+                        new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BusinessQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@QrCompanyId", businessId.businessId),
+                    }).ToList();
+
+                foreach (var item in listUsers)
+                {
+                        var resul = new ResponseUsersAll();
+                        resul.qrUserId = item.QrUserId;
+                        resul.roleCode = item.RoleCode;
+                        resul.name = item.Name;
+                        resul.userName = item.UserName;
+                        response.Add(resul);
+                }
+                var aux = JsonConvert.SerializeObject(response);
+                logger.LogError($"BranchQRPpayment: {aux}");
+                return Result<List<ResponseUsersAll>>.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+                return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
+            }
+        }
+
+        public Result<List<ResponseUsersAll>> GetUserQRBranch(BusinesBranchId businessId)
+        {
+            List<ResponseUsersAll> response = new List<ResponseUsersAll>();
+            //var listBranches = Context.BranchQRPayments.Where(x => x.BusinessQRPaymentId == businessId.businessId).ToList();
+            try
+            {
+
+                var listUsers = Context.SqlQuery<QrUserClient>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+                    new SqlParameter[]{
+                        new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BusinessQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@QrCompanyId", businessId.businessId),
+                    }).ToList();
+
+                foreach (var item in listUsers)
+                {
+                    if (item.RoleCode=="2" && item.BachAtmId==0)
+                    {
+                        var resul = new ResponseUsersAll();
+                        resul.qrUserId = item.QrUserId;
+                        resul.roleCode = item.RoleCode;
+                        resul.name = item.Name;
+                        resul.userName = item.UserName;
+                        response.Add(resul);
+                    }
+                    
+                }
+                var aux = JsonConvert.SerializeObject(response);
+                logger.LogError($"BranchQRPpayment: {aux}");
+                return Result<List<ResponseUsersAll>>.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+                return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
+            }
+        }
+        public Result<List<ResponseUsersAll>> GetUserQRAtm(BusinesBranchId businessId)
+        {
+            List<ResponseUsersAll> response = new List<ResponseUsersAll>();
+            //var listBranches = Context.BranchQRPayments.Where(x => x.BusinessQRPaymentId == businessId.businessId).ToList();
+            try
+            {
+
+                var listUsers = Context.SqlQuery<QrUserClient>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+                    new SqlParameter[]{
+                        new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BusinessQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@QrCompanyId", businessId.businessId),
+                    }).ToList();
+
+                foreach (var item in listUsers)
+                {
+                    if (item.RoleCode == "1" && item.BachAtmId == 0)
+                    {
+                        var resul = new ResponseUsersAll();
+                        resul.qrUserId = item.QrUserId;
+                        resul.roleCode = item.RoleCode;
+                        resul.name = item.Name;
+                        resul.userName = item.UserName;
+                        response.Add(resul);
+                    }
+                }
+                var aux = JsonConvert.SerializeObject(response);
+                logger.LogError($"BranchQRPpayment: {aux}");
+                return Result<List<ResponseUsersAll>>.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+                return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
+            }
+        }
