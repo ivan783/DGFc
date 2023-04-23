@@ -438,3 +438,27 @@ public Result<List<ResponseUsersAll>> GetUserQR(BusinesBranchId businessId, stri
   var result = GetUserQR(myBusinessBranchId, "atm");
 
 
+	
+	@Option VARCHAR(10),
+    @Id INT = NULL,
+    @CompanyId INT,
+    @BachAtmId INT=0,
+    @QrUserId INT,
+    @RoleCode NVARCHAR(10),
+    @UserType NVARCHAR(60),
+    @Name NVARCHAR(250),
+    @UserName NVARCHAR(100),
+    @Token NVARCHAR(250),
+    @Password NVARCHAR(250),
+    @Email NVARCHAR(4000),
+    @Cellphone NVARCHAR(4000),
+    @DocumentNumber NVARCHAR(4000),
+    @DocumentType NVARCHAR(60),
+    @DocumentExtension NVARCHAR(60),
+    @DocumentComplement NVARCHAR(100),
+    @UserCreation NVARCHAR(6),
+    @UserModification NVARCHAR(6),
+    @DateCreation DATETIME,
+    @DateModification DATETIME,
+    @PasswordExpirationDate DATETIME,
+    @IsDeleted BIT
