@@ -268,3 +268,173 @@ public Result<List<ResponseUsersAll>> GetUserQRAll(BusinesBranchId businessId)
                 return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
             }
         }
+	
+	
+	
+	public enum GetUserQROption
+{
+    All,
+    Branch,
+    ATM,
+    None
+}
+
+public Result<List<ResponseUsersAll>> GetUserQR(BusinesBranchId businessId, GetUserQROption option)
+{
+    List<ResponseUsersAll> response = new List<ResponseUsersAll>();
+
+    try
+    {
+        var listUsers = Context.SqlQuery<QrUserClient>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+            new SqlParameter[]{
+                new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                new SqlParameter("@BusinessQRPaymentId", null ?? (object)DBNull.Value),
+                new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                new SqlParameter("@QrCompanyId", businessId.businessId),
+            }).ToList();
+
+        foreach (var item in listUsers)
+        {
+            switch(option)
+            {
+                case GetUserQROption.All:
+                    var resulAll = new ResponseUsersAll();
+                    resulAll.qrUserId = item.QrUserId;
+                    resulAll.roleCode = item.RoleCode;
+                    resulAll.name = item.Name;
+                    resulAll.userName = item.UserName;
+                    response.Add(resulAll);
+                    break;
+
+                case GetUserQROption.Branch:
+                    if (item.RoleCode=="2" && item.BachAtmId==0)
+                    {
+                        var resulBranch = new ResponseUsersAll();
+                        resulBranch.qrUserId = item.QrUserId;
+                        resulBranch.roleCode = item.RoleCode;
+                        resulBranch.name = item.Name;
+                        resulBranch.userName = item.UserName;
+                        response.Add(resulBranch);
+                    }
+                    break;
+
+                case GetUserQROption.ATM:
+                    if (item.RoleCode == "1" && item.BachAtmId == 0)
+                    {
+                        var resulATM = new ResponseUsersAll();
+                        resulATM.qrUserId = item.QrUserId;
+                        resulATM.roleCode = item.RoleCode;
+                        resulATM.name = item.Name;
+                        resulATM.userName = item.UserName;
+                        response.Add(resulATM);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        var aux = JsonConvert.SerializeObject(response);
+        logger.LogError($"BranchQRPpayment: {aux}");
+        return Result<List<ResponseUsersAll>>.SetOk(response);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+        return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
+    }
+}
+
+///////
+para  llamr al metodo:
+var result = GetUserQR(myBusinesBranchId, GetUserQROption.All);
+/////////
+
+
+
+public Result<List<ResponseUsersAll>> GetUserQR(BusinesBranchId businessId, string option)
+{
+    List<ResponseUsersAll> response = new List<ResponseUsersAll>();
+    try
+    {
+        var listUsers = Context.SqlQuery<QrUserClient>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+            new SqlParameter[]{
+                new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                new SqlParameter("@BusinessQRPaymentId", null ?? (object)DBNull.Value),
+                new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                new SqlParameter("@QrCompanyId", businessId.businessId),
+            }).ToList();
+
+        switch (option.ToLower())
+        {
+            case "all":
+                foreach (var item in listUsers)
+                {
+                    var resul = new ResponseUsersAll();
+                    resul.qrUserId = item.QrUserId;
+                    resul.roleCode = item.RoleCode;
+                    resul.name = item.Name;
+                    resul.userName = item.UserName;
+                    response.Add(resul);
+                }
+                break;
+
+            case "branch":
+                foreach (var item in listUsers)
+                {
+                    if (item.RoleCode == "2" && item.BachAtmId == 0)
+                    {
+                        var resul = new ResponseUsersAll();
+                        resul.qrUserId = item.QrUserId;
+                        resul.roleCode = item.RoleCode;
+                        resul.name = item.Name;
+                        resul.userName = item.UserName;
+                        response.Add(resul);
+                    }
+                }
+                break;
+
+            case "atm":
+                foreach (var item in listUsers)
+                {
+                    if (item.RoleCode == "1" && item.BachAtmId == 0)
+                    {
+                        var resul = new ResponseUsersAll();
+                        resul.qrUserId = item.QrUserId;
+                        resul.roleCode = item.RoleCode;
+                        resul.name = item.Name;
+                        resul.userName = item.UserName;
+                        response.Add(resul);
+                    }
+                }
+                break;
+
+            default:
+                foreach (var item in listUsers)
+                {
+                    var resul = new ResponseUsersAll();
+                    resul.qrUserId = item.QrUserId;
+                    resul.roleCode = item.RoleCode;
+                    resul.name = item.Name;
+                    resul.userName = item.UserName;
+                    response.Add(resul);
+                }
+                break;
+        }
+
+        var aux = JsonConvert.SerializeObject(response);
+        logger.LogError($"BranchQRPpayment: {aux}");
+        return Result<List<ResponseUsersAll>>.SetOk(response);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+        return Result<List<ResponseUsersAll>>.SetError("Error al obtener BranchQRPayments");
+    }
+}
+  ////para llmar al metdos
+  
+  var result = GetUserQR(myBusinessBranchId, "atm");
+
+
