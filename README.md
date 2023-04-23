@@ -508,3 +508,11 @@ public void InsertarRegistro(string option, int? id, int companyId, int bachAtmI
     }
 }
 
+Para llamar el método `InsertarRegistro`, debes crear una instancia de la clase que contiene el método y luego llamar el método con los argumentos requeridos. Por ejemplo:
+
+```csharp
+MiClase miObjeto = new MiClase();
+miObjeto.InsertarRegistro("Opción", null, 1, 0, 2, "Código del rol", "Tipo de usuario", "Nombre del usuario", "Nombre de usuario", "Token", "Contraseña", "correo@ejemplo.com", "1234567890", "1234567890", "Tipo de documento", "Extensión del documento", "Complemento del documento", "Usuario de creación", "Usuario de modificación", DateTime.Now, DateTime.Now, DateTime.Now, false);
+```
+
+En este ejemplo, se crea una instancia de la clase `MiClase` y se llama al método `InsertarRegistro` con los argumentos correspondientes. En el segundo argumento, se pasa `null` para indicar que el valor de `Id` es nulo.
