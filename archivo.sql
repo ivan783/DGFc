@@ -145,3 +145,6 @@ public async Task<Result<GetRegBranchQRResponse>> SaveRegBranch(BusinesBranchId 
     return Result<GetRegBranchQRResponse>.SetOk(response);
 }
 
+
+@Id INT = NULL OUTPUT does not return the id inserted with SELECT @Id = SCOPE_IDENTITY(); for me sp
+
