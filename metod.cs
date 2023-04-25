@@ -30,3 +30,17 @@ public async Task UpdateQrserClientBachAtmIdAsync(int Id, int QrserId, int bachA
         }
     }
 }
+
+
+public async Task UpdateQrserClientBachAtmIdAsync(int Id, int QrserId, int bachAtmId)
+{
+
+var value = Context.ExecuteScalar<int>(
+    " cw.SpUpdateUser @Id, @QrserId, @bachAtmId",
+    new SqlParameter("@Id", System.Data.SqlDbType.Int),
+    new SqlParameter("@QrserId", System.Data.SqlDbType.Int),
+    new SqlParameter("@bachAtmId", System.Data.SqlDbType.Int),
+    operationParameter
+);
+
+}
