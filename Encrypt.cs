@@ -187,3 +187,69 @@ BEGIN
     SET bachAtmId = @bachAtmId
     WHERE Id = @Id AND QrserId = @QrserId;
 END
+
+
+CREATE PROCEDURE [cw].[SpBranchQRPaymentsUpIns]
+	@Option VARCHAR(10) = NULL,-- Parámetro opcional que determina la opción (por defecto es SELECT)
+	@Id INT = NULL, -- Si el Id es NULL, se insertará un nuevo registro
+	@BusinessQRPaymentId INT,
+	@BranchCode NVARCHAR(20),
+	@BranchName NVARCHAR(100),
+	@UserToken NVARCHAR(120)=NULL,
+	@UserName NVARCHAR(80)=NULL,
+	@UserCreation NVARCHAR(6),
+	@UserModification NVARCHAR(6)=NULL,
+	@DateCreation DATETIME,
+	@DateModification DATETIME=NULL,
+	@IsDeleted BIT,
+	@UserBranchQR NVARCHAR(100)=NULL,
+	@QrUserId NVARCHAR(60)=NULL,
+	@City NVARCHAR(100)
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	IF @Option='SELECT'
+    BEGIN
+        BEGIN
+            SELECT *
+            FROM [cw].[BranchQRPayments]
+			WHERE [BusinessQRPaymentId]=@BusinessQRPaymentId;
+        END
+    END
+    ELSE IF @Option='UPDATE'
+	BEGIN
+		IF @Id IS NOT NULL
+		BEGIN
+			-- Actualizar registro existente
+			UPDATE [cw].[BranchQRPayments]
+			SET [BranchName] = @BranchName,
+				[UserToken] = @UserToken,
+				[UserName] = @UserName,
+				[UserModification] = @UserModification,
+				[DateModification] = @DateModification,
+				[IsDeleted] = @IsDeleted,
+				[UserBranchQR] = @UserBranchQR,
+				[QrUserId] = @QrUserId,
+				[City] = @City
+			WHERE [Id] = @Id;
+		END
+	END
+	ELSE IF @Option='INSERT'
+	BEGIN
+		BEGIN
+			-- Insertar nuevo registro
+			INSERT INTO [cw].[BranchQRPayments] ([BusinessQRPaymentId], [BranchCode], [BranchName], [UserToken], [UserName], [UserCreation], [DateCreation], [IsDeleted], [UserBranchQR], [QrUserId], [City])
+			VALUES (@BusinessQRPaymentId, @BranchCode, @BranchName, @UserToken, @UserName, @UserCreation, @DateCreation, @IsDeleted, @UserBranchQR, @QrUserId, @City);
+			SELECT @Id = SCOPE_IDENTITY();
+		END
+	END
+	ELSE
+	BEGIN
+		SELECT [Id], [BusinessQRPaymentId], [BranchCode], [BranchName], [UserToken], [UserName], [UserCreation], [UserModification], [DateCreation], [DateModification], [IsDeleted], [UserBranchQR], [QrUserId], [City]
+		FROM [cw].[BranchQRPayments]
+		WHERE Id = @Id;
+	END
+	select @@ROWCOUNT;
+END
+GO
