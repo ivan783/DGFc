@@ -44,3 +44,16 @@ var value = Context.ExecuteScalar<int>(
 );
 
 }
+
+public async Task UpdateQrserClientBachAtmIdAsync(int Id, int QrserId, int bachAtmId)
+{
+
+var value = Context.ExecuteScalar<int>(
+    " cw.SpUpdateUser @Id, @QrserId, @bachAtmId",
+    new SqlParameter("@Id", Id),
+    new SqlParameter("@QrserId", QrserId),
+    new SqlParameter("@bachAtmId", bachAtmId),
+    operationParameter
+);
+
+}
