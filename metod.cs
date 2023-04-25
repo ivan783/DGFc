@@ -57,3 +57,24 @@ var value = Context.ExecuteScalar<int>(
 );
 
 }
+
+public async Task UpdateQrserClientBachAtmIdAsync(int Id, int QrserId, int bachAtmId)
+{
+    const string storedProcedureName = "cw.SpUpdateUser";
+
+    try
+    {
+        var parameters = new SqlParameter[]
+        {
+            new SqlParameter("@Id", Id),
+            new SqlParameter("@QrserId", QrserId),
+            new SqlParameter("@bachAtmId", bachAtmId)
+        };
+
+        var value = await Context.ExecuteScalarAsync<int>(storedProcedureName, parameters);
+    }
+    catch (Exception ex)
+    {
+        // Maneja cualquier excepción aquí y cierra la conexión con la base de datos de manera adecuada.
+    }
+}
