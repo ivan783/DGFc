@@ -41,3 +41,32 @@ public int SaveBranchQRPayment(int? id, int businessQRPaymentId, string branchCo
 }
 
 int branchQRPaymentId = SaveBranchQRPayment(id, businessQRPaymentId, branchCode, branchName, userToken, userName, userCreation, userModification, dateCreation, dateModification, isDeleted, userBranchQR, qrUserId, city);
+
+
+public async Task<Result<GetRegBranchQRResponse>> SaveRegBranch(BusinesBranchId bisinessId)
+        {
+            GetRegBranchQRResponse response = new GetRegBranchQRResponse();
+            GetRegBranchQRRequest request = new GetRegBranchQRRequest();
+            var appUserId = configuration.GetSection("Connectors").GetSection("ApiQR")["AppUserId"];
+            var publicToken = configuration.GetSection("Connectors").GetSection("ApiQR")["PublicToken"];
+            var channel = configuration.GetSection("Connectors").GetSection("ApiQR")["Channel"];
+            var url = configuration.GetSection("Connectors").GetSection("ApiQR")["AddresRegBusiness"];
+            var businessQr = Context.BusinessQRPayments.Where(x => x.CompanyId == this.companyId).FirstOrDefault();
+            request.PublicToken = publicToken;
+            request.AppUserId = appUserId;
+            request.BusinessCode = 1;
+            request.BranchName = "GF" + this.companyId;
+            request.City = "";
+            request.Channel = channel;
+            var aux = JsonConvert.SerializeObject(request);
+            logger.LogError($"Request: {aux}");
+            response = this.manager.SaveRegBranchQR(request, url);
+            if (response.State=="00")
+            {
+                int branchQRPaymentId = SaveBranchQRPayment(0, bisinessId.businessId, response.Data.BranchCode.ToString(), "", "Not", "Not",
+                                    "Migra", "", DateTime.Now, DateTime.Now, false, "Not", 34, "City");
+            }
+
+
+            return Result<GetRegBranchQRResponse>.SetOk(response);
+        }
