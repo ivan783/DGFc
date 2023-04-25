@@ -176,3 +176,14 @@ public async Task<Result<GetRegUserQRResponse>> RegUsers(ReqRegUserDto dto)
                  return Result<GetRegUserQRResponse>.SetError("Error al Registrar user"); 
              } 
          }
+
+CREATE PROCEDURE UpdateQrserClientBachAtmId
+    @Id int,
+    @QrserId int,
+    @bachAtmId int
+AS
+BEGIN
+    UPDATE cw.QrserClient
+    SET bachAtmId = @bachAtmId
+    WHERE Id = @Id AND QrserId = @QrserId;
+END
