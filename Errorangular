@@ -62,3 +62,27 @@ export class UserListComponent implements OnInit {
 getEstado(isActive: boolean): string {
   return isActive ? 'Activo' : 'Inactivo';
 }
+
+
+constructor(private userService: UserService, private modalService: NgbModal) { }
+
+
+toggleUserStateWithConfirmation(usuario: Usuario) {
+  const modalRef = this.modalService.open(ConfirmationModalComponent);
+  modalRef.componentInstance.message = `¿Está seguro que desea ${usuario.isActive ? 'desactivar' : 'activar'} al usuario ${usuario.nombre}?`;
+  modalRef.result.then((result) => {
+    if (result === 'confirm') {
+      this.toggleUserState(usuario);
+    } else {
+      // El usuario canceló la operación
+      // Aquí puedes realizar alguna acción adicional si lo deseas
+    }
+  }).catch(() => {
+    // El modal se cerró sin confirmar o cancelar la operación
+    // Aquí puedes realizar alguna acción adicional si lo deseas
+  });
+}
+
+<input class="form-check-input" type="checkbox" id="estado-{{ usuario.id }}" [(ngModel)]="usuario.isActive" (change)="toggleUserStateWithConfirmation(usuario)">
+
+
