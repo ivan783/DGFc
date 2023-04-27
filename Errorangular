@@ -142,3 +142,6 @@ BEGIN
         WHERE Id = @Id
     )
 END
+
+
+The data reader is incompatible with the specified 'BCP.CredinetWeb.Functions.QR.Business.BranchQRPayment'. A member of the type, 'BusinessQRPaymentId', does not have a corresponding column in the data reader with the same name.
