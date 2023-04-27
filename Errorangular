@@ -107,3 +107,38 @@ cw.QrUserClients QR on AT.QrUserId=QR.QrUserId INNER JOIN
 cw.BranchQRPayments BP on BP.Id=AT.BranchQRPaymentId INNER JOIN
 cw.BusinessQRPayments BS on BS.Id=BP.BusinessQRPaymentId
 WHERE BS.Id=1
+
+
+-- Stored procedure for the first select statement
+CREATE PROCEDURE sp_BranchQRPayments
+    @Id INT
+AS
+BEGIN
+    SELECT BP.Id, BP.BranchName, QR.Name, BP.IsDeleted
+    FROM cw.BranchQRPayments BP 
+    INNER JOIN cw.QrUserClients QR 
+    ON BP.QrUserId = QR.QrUserId
+    WHERE BP.BusinessQRPaymentId IN (
+        SELECT Id 
+        FROM cw.BusinessQRPayments 
+        WHERE Id = @Id
+    )
+END
+
+-- Stored procedure for the second select statement
+CREATE PROCEDURE sp_AtmQRPayments
+    @Id INT
+AS
+BEGIN
+    SELECT AT.Id, AT.AtmName, QR.Name, AT.IsDeleted
+    FROM cw.AtmQRPayments AT 
+    INNER JOIN cw.QrUserClients QR 
+    ON AT.QrUserId = QR.QrUserId 
+    INNER JOIN cw.BranchQRPayments BP 
+    ON BP.Id = AT.BranchQRPaymentId 
+    WHERE BP.BusinessQRPaymentId IN (
+        SELECT Id 
+        FROM cw.BusinessQRPayments 
+        WHERE Id = @Id
+    )
+END
