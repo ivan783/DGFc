@@ -145,3 +145,26 @@ END
 
 
 The data reader is incompatible with the specified 'BCP.CredinetWeb.Functions.QR.Business.BranchQRPayment'. A member of the type, 'BusinessQRPaymentId', does not have a corresponding column in the data reader with the same name.
+
+var listBranches = Context.SqlQuery<BranchQRPayment>("cw.SpBranchQRPayments @Id",
+                    new SqlParameter[]{
+                        new SqlParameter("@Id", 1)
+                    });
+
+                    foreach (var item in listBranches)
+                    {
+                        if (item.IsDeleted == false)
+                        {
+                            var resul = new BranchQRPaymentResponse();
+                            resul.Id = item.Id;
+                            resul.BusinessQRPaymentId = item.BusinessQRPaymentId;
+                            resul.BranchCode = item.BranchCode;
+                            resul.BranchName = item.BranchName;
+                            response.Add(resul);
+                        }
+
+                    }
+                    var aux = JsonConvert.SerializeObject(response);
+                    logger.LogError($"BranchQRPpayment: {aux}");
+                    return Result<List<BranchQRPaymentResponse>>.SetOk(response);
+                    
