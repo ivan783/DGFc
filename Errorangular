@@ -94,3 +94,16 @@ cw.QrUserClients QR on BP.QrUserId=QR.QrUserId
 
 select AT.Id, AT.AtmName, QR.Name , AT.IsDeleted from cw.AtmQRPayments AT inner JOIN
 cw.QrUserClients QR on AT.QrUserId=QR.QrUserId
+
+
+
+select BP.Id, BP.BranchName, QR.Name , BP.IsDeleted from cw.BranchQRPayments BP inner JOIN
+cw.QrUserClients QR on BP.QrUserId=QR.QrUserId
+inner JOIN cw.BusinessQRPayments BS on BS.Id=BP.BusinessQRPaymentId
+where BS.Id=1
+
+select AT.Id, AT.AtmName, QR.Name , AT.IsDeleted from cw.AtmQRPayments AT inner JOIN
+cw.QrUserClients QR on AT.QrUserId=QR.QrUserId INNER JOIN
+cw.BranchQRPayments BP on BP.Id=AT.BranchQRPaymentId INNER JOIN
+cw.BusinessQRPayments BS on BS.Id=BP.BusinessQRPaymentId
+WHERE BS.Id=1
