@@ -52,3 +52,13 @@ export class UserListComponent implements OnInit {
     this.userService.updateUser(usuario).subscribe();
   }
 }
+<div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" id="estado-{{ usuario.id }}" [(ngModel)]="usuario.isActive">
+  <label class="form-check-label" for="estado-{{ usuario.id }}">
+    {{ getEstado(usuario.isActive) }}
+  </label>
+</div>
+
+getEstado(isActive: boolean): string {
+  return isActive ? 'Activo' : 'Inactivo';
+}
