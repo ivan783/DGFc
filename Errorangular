@@ -168,3 +168,20 @@ var listBranches = Context.SqlQuery<BranchQRPayment>("cw.SpBranchQRPayments @Id"
                     logger.LogError($"BranchQRPpayment: {aux}");
                     return Result<List<BranchQRPaymentResponse>>.SetOk(response);
                     
+                    
+                    
+                    CREATE PROCEDURE sp_BranchQRPayments
+    @Id INT
+AS
+BEGIN
+    SELECT BP.Id, BP.BranchName, QR.Name, BP.IsDeleted, BP.BusinessQRPaymentId
+    FROM cw.BranchQRPayments BP 
+    INNER JOIN cw.QrUserClients QR 
+    ON BP.QrUserId = QR.QrUserId
+    WHERE BP.BusinessQRPaymentId IN (
+        SELECT Id 
+        FROM cw.BusinessQRPayments 
+        WHERE Id = @Id
+    )
+END
+
