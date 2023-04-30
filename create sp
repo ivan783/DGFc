@@ -116,3 +116,8 @@ END
                 return Result<List<BranchQRPaymentResponse>>.SetError("Error al obtener BranchQRPayments");
             }
         }
+        
+        
+        var combinedList = listBranches.Select(x => new { Id = x.Id, Name = x.Name })
+    .Union(listBranchesV1.Select(x => new { Id = x.Id, Name = x.Name }))
+    .ToList();
