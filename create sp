@@ -30,3 +30,89 @@ BEGIN
   AND BR.UserToken != 'SIN TOKEN'
   AND BR.BusinessQRPaymentId = @Id
 END
+
+
+ public Result<List<BranchQRPaymentResponse>> GetBranchQR(BusinesBranchId businessId)
+        {
+            List<BranchQRPaymentResponse> response = new List<BranchQRPaymentResponse>();
+            //var listBranches = Context.BranchQRPayments.Where(x => x.BusinessQRPaymentId == businessId.businessId).ToList();
+            try
+            {
+                if (businessId.ListBranch =="A")
+                {
+                    var listBranches = Context.SqlQuery<BranchSp>("cw.SpBranchQRPayments @Id",
+                    new SqlParameter[]{
+                        new SqlParameter("@Id", businessId.businessId)
+                    });
+
+                    foreach (var item in listBranches)
+                    {
+                        
+                            var resul = new BranchQRPaymentResponse();
+                            resul.Id = item.Id;
+                            resul.BranchName = item.BranchName;
+                            resul.Name = item.Name;
+                            resul.City = item.City;
+                            resul.IsDeleted = item.IsDeleted==false?true:false;
+                            response.Add(resul);
+                        
+
+                    }
+
+                    var listBranchesV1 = Context.SqlQuery<SpBranchQRV1>("cw.SpBranchQRPayments @Id",
+                    new SqlParameter[]{
+                        new SqlParameter("@Id", businessId.businessId)
+                    });
+
+                    foreach (var item in listBranchesV1)
+                    {
+
+                        var resul = new BranchQRPaymentResponse();
+                        resul.Id = item.Id;
+                        resul.BranchName = item.BranchName;
+                        resul.Name = item.UserBranchQR;
+                        resul.City = "Aleatorio";
+                        resul.IsDeleted = item.IsDeleted == false ? true : false;
+                        response.Add(resul);
+
+
+                    }
+                    var aux = JsonConvert.SerializeObject(response);
+                    logger.LogError($"Lista BranchQRPpayment: {aux}");
+                    return Result<List<BranchQRPaymentResponse>>.SetOk(response);
+                }
+                else
+                {
+                    var listBranches = Context.SqlQuery<BranchQRPayment>("cw.SpGetQrData @CompanyId,@BusinessQRPaymentId,@BranchQRPaymentId,@QrCompanyId",
+                    new SqlParameter[]{
+                        new SqlParameter("@CompanyId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@BusinessQRPaymentId", businessId.businessId),
+                        new SqlParameter("@BranchQRPaymentId", null ?? (object)DBNull.Value),
+                        new SqlParameter("@QrCompanyId", null ?? (object)DBNull.Value),
+                    }).ToList();
+
+                    foreach (var item in listBranches)
+                    {
+                        if (item.IsDeleted == false)
+                        {
+                            var resul = new BranchQRPaymentResponse();
+                            resul.Id = item.Id;
+                            resul.BusinessQRPaymentId = item.BusinessQRPaymentId;
+                            resul.BranchCode = item.BranchCode;
+                            resul.BranchName = item.BranchName;
+                            response.Add(resul);
+                        }
+
+                    }
+                    var aux = JsonConvert.SerializeObject(response);
+                    logger.LogError($"BranchQRPpayment: {aux}");
+                    return Result<List<BranchQRPaymentResponse>>.SetOk(response);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener BranchQRPayments: {ex.Message}");
+                return Result<List<BranchQRPaymentResponse>>.SetError("Error al obtener BranchQRPayments");
+            }
+        }
