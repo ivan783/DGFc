@@ -16,3 +16,17 @@ And BR.UserToken !='SIN TOKEN'
         FROM cw.BusinessQRPayments 
         WHERE Id = 1
     )
+
+
+CREATE PROCEDURE obtener_datos
+  @Id int
+AS
+BEGIN
+  SET NOCOUNT ON;
+  SELECT BR.Id, BR.BranchName, BR.UserBranchQR, CONVERT(CHAR(8), BR.DateCreation, 112) as Fecha, BR.IsDeleted 
+  FROM cw.BranchQRPayments BR 
+  INNER JOIN cw.BusinessQRPayments BU ON BU.Id = BR.BusinessQRPaymentId
+  WHERE CONVERT(CHAR(8), BR.DateCreation, 112) <= '20230427'
+  AND BR.UserToken != 'SIN TOKEN'
+  AND BR.BusinessQRPaymentId = @Id
+END
