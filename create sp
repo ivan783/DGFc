@@ -6,3 +6,13 @@ INNER join cw.QrUserClients QC on QC.CompanyId=BQ.CompanyId
         FROM cw.BusinessQRPayments 
         WHERE Id = 1
     )
+
+select BR.Id, BR.BranchName, BR.UserBranchQR, CONVERT(CHAR(8), BR.DateCreation, 112) as Fecha, BR.IsDeleted from cw.BranchQRPayments BR inner join 
+cw.BusinessQRPayments BU on BU.Id=BR.BusinessQRPaymentId
+where CONVERT(CHAR(8), BR.DateCreation, 112)<='20230427'
+And BR.UserToken !='SIN TOKEN'
+ And BR.BusinessQRPaymentId IN (
+        SELECT Id
+        FROM cw.BusinessQRPayments 
+        WHERE Id = 1
+    )
