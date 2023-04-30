@@ -1,0 +1,8 @@
+select * from cw.BranchQRPayments BP 
+INNER JOIN cw.BusinessQRPayments BQ on BQ.Id=BP.BusinessQRPaymentId
+INNER join cw.QrUserClients QC on QC.CompanyId=BQ.CompanyId
+ WHERE BP.BusinessQRPaymentId IN (
+        SELECT Id
+        FROM cw.BusinessQRPayments 
+        WHERE Id = 1
+    )
