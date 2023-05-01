@@ -1,0 +1,152 @@
+public async Task<List<Result<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto)
+{
+    var appUserId = configuration["Connectors:ApiQR:AppUserId"];
+    var publicToken = configuration["Connectors:ApiQR:PublicToken"];
+    var channel = configuration["Connectors:ApiQR:Channel"];
+    var url = configuration["Connectors:ApiQR:AddressRegUsers"];
+
+    var results = new List<Result<GetRegUserQRResponse>>();
+
+    foreach (var user in dto.ClientResponseUser)
+    {
+        var request = new GetRegUserQRRequest
+        {
+            AppUserId = appUserId,
+            PublicToken = publicToken,
+            Channel = channel,
+            BusinessCode = dto.businessCode,
+            TypeUser = "CW",
+            RoleCode = user.roleCode,
+            Device = new Device
+            {
+                Id = "01",
+                Type = "PC",
+                Name = "PC T",
+                Os = "Windows 10"
+            },
+            Client = new Client
+            {
+                Name = user.name,
+                Password = EncryptDecrypt(true, user.password),
+                UserName = user.userName,
+                Email = user.email,
+                DocumentComplement = string.IsNullOrEmpty(user.documentComplement) ? "00" : user.documentComplement,
+                DocumentExtension = user.documentExtension,
+                DocumentNumber = user.documentNumber,
+                DocumentType = GetUserQRDocumentType(user.documentType),
+                PasswordExpirationDate = DateTime.Now.ToString()
+            }
+        };
+
+        try
+        {
+            var response = await manager.SaveRegUserQR(request, url);
+            if (response.State == "00")
+            {
+                logger.LogInformation($"UserIdQR: {response.Data.Client.Id}");
+                InsertarRegistro(0, companyId, 0, response.Data.Client.Id, request.RoleCode, user.typeUser, request.Client.Name, response.Data.Client.UserName, response.Data.Client.Token.ToString(), request.Client.Password, request.Client.Email, request.Client.Cellphone, request.Client.DocumentNumber, request.Client.DocumentType, request.Client.DocumentExtension, request.Client.DocumentComplement, "Migra", "migra", DateTime.Now, DateTime.Now, DateTime.Now, false);
+            }
+            results.Add(Result<GetRegUserQRResponse>.SetOk(response.Data));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error al registrar Usuario QR para el usuario {user.name}");
+            results.Add(Result<GetRegUserQRResponse>.SetError($"Error al registrar Usuario QR para el usuario {user.name}"));
+        }
+    }
+
+    return results;
+}
+
+private string GetUserQRDocumentType(string documentType)
+{
+    switch (documentType.ToUpperInvariant())
+    {
+        case "C.I.":
+            return "Q";
+        case "RUC":
+        case "NIT":
+            return "R";
+        case "PASAPORTE":
+            return "P";
+        default:
+            return "O";
+    }
+}
+
+public async Task<List<Result<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto)
+{
+    var appUserId = configuration["Connectors:ApiQR:AppUserId"];
+    var publicToken = configuration["Connectors:ApiQR:PublicToken"];
+    var channel = configuration["Connectors:ApiQR:Channel"];
+    var url = configuration["Connectors:ApiQR:AddressRegUsers"];
+
+    var results = new List<Result<GetRegUserQRResponse>>();
+
+    foreach (var user in dto.ClientResponseUser)
+    {
+        var request = new GetRegUserQRRequest
+        {
+            AppUserId = appUserId,
+            PublicToken = publicToken,
+            Channel = channel,
+            BusinessCode = dto.businessCode,
+            TypeUser = "CW",
+            RoleCode = user.roleCode,
+            Device = new Device
+            {
+                Id = "01",
+                Type = "PC",
+                Name = "PC T",
+                Os = "Windows 10"
+            },
+            Client = new Client
+            {
+                Name = user.name,
+                Password = EncryptDecrypt(true, user.password),
+                UserName = user.userName,
+                Email = user.email,
+                DocumentComplement = string.IsNullOrEmpty(user.documentComplement) ? "00" : user.documentComplement,
+                DocumentExtension = user.documentExtension,
+                DocumentNumber = user.documentNumber,
+                DocumentType = GetUserQRDocumentType(user.documentType),
+                PasswordExpirationDate = DateTime.Now.ToString()
+            }
+        };
+
+        try
+        {
+            var response = await manager.SaveRegUserQR(request, url);
+            if (response.State == "00")
+            {
+                logger.LogInformation($"UserIdQR: {response.Data.Client.Id}");
+                InsertarRegistro(0, companyId, 0, response.Data.Client.Id, request.RoleCode, user.typeUser, request.Client.Name, response.Data.Client.UserName, response.Data.Client.Token.ToString(), request.Client.Password, request.Client.Email, request.Client.Cellphone, request.Client.DocumentNumber, request.Client.DocumentType, request.Client.DocumentExtension, request.Client.DocumentComplement, "Migra", "migra", DateTime.Now, DateTime.Now, DateTime.Now, false);
+            }
+            results.Add(Result<GetRegUserQRResponse>.SetOk(response.Data));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error al registrar Usuario QR para el usuario {user.name}");
+            results.Add(Result<GetRegUserQRResponse>.SetError($"Error al registrar Usuario QR para el usuario {user.name}"));
+        }
+    }
+
+    return results;
+}
+
+private string GetUserQRDocumentType(string documentType)
+{
+    switch (documentType.ToUpperInvariant())
+    {
+        case "C.I.":
+            return "Q";
+        case "RUC":
+        case "NIT":
+            return "R";
+        case "PASAPORTE":
+            return "P";
+        default:
+            return "O";
+    }
+}
+
