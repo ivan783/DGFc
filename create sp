@@ -189,3 +189,193 @@ public async Task<Result<GetRegUserQRResponse>> RegUsers(ReqRegUserDto dto)
                 return Result<GetRegUserQRResponse>.SetError("Error al Registrar user");
             }
         }
+
+
+public async Task<Result<GetRegUserQRResponse>> RegUsers(ReqRegUserDto dto)
+{
+    try
+    {
+        GetRegUserQRRequest request = new GetRegUserQRRequest();
+        var appUserId = configuration.GetSection("Connectors").GetSection("ApiQR")["AppUserId"];
+        var publicToken = configuration.GetSection("Connectors").GetSection("ApiQR")["PublicToken"];
+        var channel = configuration.GetSection("Connectors").GetSection("ApiQR")["Channel"];
+        var url = configuration.GetSection("Connectors").GetSection("ApiQR")["AddressRegUsers"];
+        
+        request.AppUserId = appUserId;
+        request.Channel = channel;
+        request.PublicToken = publicToken;
+        request.TypeUser = "CW";
+        
+        var result = Result<GetRegUserQRResponse>.SetOk(new GetRegUserQRResponse());
+
+        var tasks = dto.ClientResponseUser.Select(async addUser =>
+        {
+            try
+            {
+                request.RoleCode = addUser.roleCode;
+                request.BusinessCode = dto.businessCode;
+                
+                request.Client = new Client
+                {
+                    Name = addUser.name,
+                    Password = EncryptDecrypt(true, addUser.password),
+                    UserName = addUser.userName,
+                    Email = addUser.email,
+                    DocumentComplement = string.IsNullOrEmpty(addUser.documentComplement) ? "00" : addUser.documentComplement,
+                    DocumentExtension = addUser.documentExtension,
+                    DocumentNumber = addUser.documentNumber,
+                    PasswordExpirationDate = DateTime.Now.ToString(),
+                };
+                
+                request.Device = new Device
+                {
+                    Id = "01",
+                    Type = "PC",
+                    Name = "PC T",
+                    Os = "Windows 10",
+                };
+                
+                var aux = JsonConvert.SerializeObject(request);
+                logger.LogError($"Request: {aux}");
+
+                var response = await this.manager.SaveRegUserQR(request, url).ConfigureAwait(false);
+                
+                var aux1 = JsonConvert.SerializeObject(response.Message);
+                logger.LogError($"Response Mensage: {aux1}");
+                var aux2 = JsonConvert.SerializeObject(response.State);
+                logger.LogError($"Response Stado: {aux2}");
+
+                if (response?.State == "00")
+                {
+                    logger.LogError($"UserIdQR:-----{response.Data.Client.Id}----");
+                    InsertarRegistro(0, companyId, 0, response.Data.Client.Id, request.RoleCode, addUser.typeUser, request.Client.Name,
+                        response?.Data?.Client?.UserName, response?.Data?.Client?.Token.ToString(), request.Client.Password, request.Client.Email, request.Client.Cellphone, request.Client.DocumentNumber,
+                        request.Client.DocumentType, request.Client.DocumentExtension, request.Client.DocumentComplement, "Migra",
+                        "migra", DateTime.Now, DateTime.Now, DateTime.Now, false);
+                }
+                
+                return response;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al registrar Usuario QR excepcion message: {ex.Message}");
+                return Result<GetRegUserQRResponse>.SetError("Error al Registrar user");
+            }
+        });
+        
+        var responses = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        foreach (var response in responses)
+        {
+            if (response.State != "00")
+            {
+                return Result<GetRegUserQRResponse>.SetError($"Mensaje de error: {response.Message}");
+            }
+        }
+
+        return result;
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error al registrar Usuario QR excepcion message: {ex.Message}");
+        return Result<GetRegUserQRResponse>.SetError("Error al Registrar user");
+    }
+}
+
+
+public async Task<List<Result<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto)
+{
+    try
+    {
+        var appUserId = configuration.GetSection("Connectors").GetSection("ApiQR")["AppUserId"];
+        var publicToken = configuration.GetSection("Connectors").GetSection("ApiQR")["PublicToken"];
+        var channel = configuration.GetSection("Connectors").GetSection("ApiQR")["Channel"];
+        var url = configuration.GetSection("Connectors").GetSection("ApiQR")["AddressRegUsers"];
+
+        var result = new List<Result<GetRegUserQRResponse>>();
+
+        foreach (var addUser in dto.ClientResponseUser)
+        {
+            var request = new GetRegUserQRRequest
+            {
+                AppUserId = appUserId,
+                PublicToken = publicToken,
+                Channel = channel,
+                BusinessCode = dto.businessCode,
+                TypeUser = "CW",
+                RoleCode = addUser.roleCode,
+                Device = new Device
+                {
+                    Id = "01",
+                    Type = "PC",
+                    Name = "PC T",
+                    Os = "Windows 10"
+                },
+                Client = new Client
+                {
+                    Name = addUser.name,
+                    Password = EncryptDecrypt(true, addUser.password),
+                    UserName = addUser.userName,
+                    Email = addUser.email,
+                    DocumentComplement = string.IsNullOrEmpty(addUser.documentComplement) ? "00" : addUser.documentComplement,
+                    DocumentExtension = addUser.documentExtension,
+                    DocumentNumber = addUser.documentNumber,
+                    PasswordExpirationDate = DateTime.Now.ToString()
+                }
+            };
+
+            var aux = JsonConvert.SerializeObject(request);
+            logger.LogError($"Request: {aux}");
+
+            var response = await Task.Run(() => this.manager.SaveRegUserQR(request, url));
+
+            var aux1 = JsonConvert.SerializeObject(response.Message);
+            logger.LogError($"Response Mensage: {aux1}");
+
+            var aux2 = JsonConvert.SerializeObject(response.State);
+            logger.LogError($"Response Stado: {aux2}");
+
+            if (response?.State == "00")
+            {
+                logger.LogError($"UserIdQR:-----{response.Data.Client.Id}----");
+
+                InsertarRegistro(
+                    0,
+                    companyId,
+                    0,
+                    response.Data.Client.Id,
+                    request.RoleCode,
+                    addUser.typeUser,
+                    request.Client.Name,
+                    response?.Data?.Client?.UserName,
+                    response?.Data?.Client?.Token.ToString(),
+                    request.Client.Password,
+                    request.Client.Email,
+                    request.Client.Cellphone,
+                    request.Client.DocumentNumber,
+                    request.Client.DocumentType,
+                    request.Client.DocumentExtension,
+                    request.Client.DocumentComplement,
+                    "Migra",
+                    "migra",
+                    DateTime.Now,
+                    DateTime.Now,
+                    DateTime.Now,
+                    false
+                );
+            }
+
+            result.Add(response?.State != "00"
+                ? Result<GetRegUserQRResponse>.SetError($"Mensaje de error: {response.Message}")
+                : Result<GetRegUserQRResponse>.SetOk(responseRes));
+        }
+
+        return result;
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error al registrar Usuario QR excepcion message: {ex.Message}");
+        return new List<Result<GetRegUserQRResponse>> { Result<GetRegUserQRResponse>.SetError("Error al Registrar user") };
+    }
+}
+
