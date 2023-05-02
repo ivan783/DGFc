@@ -1,0 +1,56 @@
+ public Result<List<BranchQRPaymentResponse>> GetBranchQR(BusinesBranchId businessId)
+        {
+            List<BranchQRPaymentResponse> response = new List<BranchQRPaymentResponse>();
+            //var listBranches = Context.BranchQRPayments.Where(x => x.BusinessQRPaymentId == businessId.businessId).ToList();
+            try
+            {
+                if (businessId.ListBranch =="A")
+                {
+                    var listBranches = Context.SqlQuery<BranchSp>("cw.SpBranchQRPayments @Id",
+                    new SqlParameter[]{
+                        new SqlParameter("@Id", businessId.businessId)
+                    }).ToList();
+
+                    foreach (var item in listBranches)
+                    {
+                        
+                            var resul = new BranchQRPaymentResponse();
+                            resul.Id = item.Id;
+                            resul.BranchName = item.BranchName;
+                            resul.Name = item.Name;
+                            resul.City = item.City;
+                            resul.IsDeleted = item.IsDeleted==false?true:false;
+                            response.Add(resul);
+                        
+
+                    }
+
+                    var listBranchesV1 = Context.SqlQuery<SpBranchQRV1>("cw.SpBranchQRV1 @Id",
+                    new SqlParameter[]{
+                        new SqlParameter("@Id", businessId.businessId)
+                    }).ToList();
+
+                    foreach (var item in listBranchesV1)
+                    {
+
+                        var resul = new BranchQRPaymentResponse();
+                        resul.Id = item.Id;
+                        resul.BranchName = item.BranchName;
+                        resul.Name = item.UserBranchQR;
+                        resul.City = "";
+                        resul.IsDeleted = item.IsDeleted == false ? true : false;
+                        response.Add(resul);
+
+
+                    }
+                    var combinedList = listBranches.Select(x => new { Id = x.Id, Name = x.Name, BranchName=x.BranchName,
+                                        City=x.City, IsDeleted=x.IsDeleted})
+                                    .Union(listBranchesV1.Select(x => new { Id = x.Id, Name = x.UserBranchQR, BranchName = x.BranchName,
+                                        City = "", IsDeleted = x.IsDeleted
+                                    }))
+                                    .ToList();
+                    //response = combinedList;
+                    var aux = JsonConvert.SerializeObject(response);
+                    logger.LogError($"Lista BranchQRPpayment: {aux}");
+                    return Result<List<BranchQRPaymentResponse>>.SetOk(response);
+                }
