@@ -54,3 +54,18 @@
                     logger.LogError($"Lista BranchQRPpayment: {aux}");
                     return Result<List<BranchQRPaymentResponse>>.SetOk(response);
                 }
+
+
+¡Claro, con gusto puedo ayudarte a redactar tu correo!
+
+Estimado Limbert,
+
+Espero que te encuentres bien. Te escribo para informarte sobre una nueva opción que hemos incorporado en el módulo de QR. Se trata de la "Administración QR", la cual permite crear usuarios con roles de jefe de agencia o cajero, así como también la creación de sucursales y cajas.
+
+Como parte del proceso de implementación, es importante validar que esta opción se esté desempeñando de manera correcta. Por lo tanto, te solicito que puedas revisar esta nueva funcionalidad y asegurarte de que todo esté en orden.
+
+Agradezco tu colaboración en este proceso de validación. Quedo a la espera de tus comentarios al respecto.
+
+Saludos cordiales,
+
+[Tu nombre]
