@@ -1,0 +1,33 @@
+{
+   "nameid":"10221",
+   "unique_name":"9000010000130765",
+   "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider":"ASP.NET Identity",
+   "AspNet.Identity.SecurityStamp":"50934129-6af1-45aa-9bdb-f0b312a0712c",
+   "role":[
+      "AUTORIZADOR",
+      "CONSULTOR",
+      "CONTROLADOR",
+      "INICIADOR"
+   ],
+   "company_id":"2295",
+   "company_state":true,
+   "company_name":"SILLERICO NEGANEZ RODOLFO ANDRES",
+   "controller_scheme":false,
+   "user_type":"P",
+   "user_name":"REMBERTO HILAQUITA MAMANI",
+   "user_document_number":"4850147",
+   "user_document_extension":"LP ",
+   "user_document_type":"Q",
+   "exchange_buy":"6.85",
+   "exchange_sale":"6.97",
+   "is_signature":true,
+   "authorize_operation":false,
+   "authorize_pin":false,
+   "authorize_ftp":true,
+   "is_validbatchtoken":false,
+   "guid":"fa7225d2-4232-4056-9d9c-284b47b0d6aa",
+   "iss":"http://localhost:53793",
+   "aud":"f82e450ad49e4284a613ed9a4a5deb74",
+   "exp":1683214841,
+   "nbf":1683213041
+}
