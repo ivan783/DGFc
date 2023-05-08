@@ -28,3 +28,12 @@ WITH
 INSERT INTO #tabla_temporal (columna1, columna2, columna3, ...)
 SELECT columna1, columna2, columna3, ...
 FROM OPENROWSET('Microsoft.ACE.OLEDB.16.0', 'Excel 12.0;Database=Ruta_del_archivo_de_Excel', 'SELECT * FROM [Nombre_de_la_hoja$]')
+BULK INSERT #tabla_temporal
+FROM 'Ruta_del_archivo_CSV'
+WITH
+(
+    FORMAT = 'CSV',
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2
+);
