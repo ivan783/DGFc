@@ -37,3 +37,11 @@ WITH
     ROWTERMINATOR = '\n',
     FIRSTROW = 2
 );
+BULK INSERT #tabla_temporal
+FROM 'Ruta_del_archivo_CSV'
+WITH
+(
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2
+);
