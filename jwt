@@ -71,3 +71,42 @@ BEGIN
     INNER JOIN cw.EconomicGroups EG ON CM.EconomicGroupId = EG.Id
     WHERE UD.Idc = @UDId AND EG.Id = @EGId
 END
+
+public async Task<Result<List<GetResponseCompanyApp>>> GetRespCompaniesApp()
+       
+        {
+            List<GetResponseCompanyApp> response = new List<GetResponseCompanyApp>();
+             try
+            {
+                int compId = companyId;
+                var listUserComp = Context.SqlQuery<GetUserCompanyApp>("cw.SpGetUserCompanyApp @UDId,@EGId",
+                    new SqlParameter[]{
+                        //new SqlParameter("@UDId", compId),
+                        new SqlParameter("@UDId", "4850147"),//null ?? (object)DBNull.Value),
+                        new SqlParameter("@EGId", 2260) //null ?? (object)DBNull.Value),
+                        //new SqlParameter("@QrCompanyId", null ?? (object)DBNull.Value),
+                    }).ToList();
+
+                foreach (var item in listUserComp)
+                {
+                    
+                        var resul = new GetResponseCompanyApp();
+                        resul.Id = item.Id;
+                        resul.IdcCompany = item.IdcCompany;
+                        resul.PasswordHash = item.PasswordHash;
+                        resul.SecurityStamp = item.SecurityStamp;
+                        response.Add(resul);
+
+                }
+
+                var aux = JsonConvert.SerializeObject(response);
+                logger.LogError($"List Compani: {aux}");
+
+                return Result<List<GetResponseCompanyApp>>.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener Lista: {ex.Message}");
+                return Result<List<GetResponseCompanyApp>>.SetError("Error al obtener Lista");
+            }
+        }
