@@ -32,3 +32,10 @@
    "nbf":1683213041
 }
 https://github.com/gavilanch/CursoRESTfulAPIsASPNETCore
+
+select UD.Id, UD.Name as UserName, CM.Name as CompanyName, CM.Idc as IdcCompany, CM.TypeIdc as TypeIdcComp, UD.Idc as UserDetalleIdc,
+ UD.IdcType as TypeIdcUserDet, EG.Name as EconomiName, US.UserName, US.PasswordHash, US.SecurityStamp, EG.Id from cw.Companies CM 
+INNER JOIN cw.Users US on CM.Id=US.CompanyId
+inner join cw.EconomicGroups EG on EG.Id=CM.EconomicGroupId
+inner join cw.UserDetails UD on UD.Id=US.Id
+where UD.Idc='4850147' and EG.Id=2260
