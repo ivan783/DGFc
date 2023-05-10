@@ -39,3 +39,35 @@ INNER JOIN cw.Users US on CM.Id=US.CompanyId
 inner join cw.EconomicGroups EG on EG.Id=CM.EconomicGroupId
 inner join cw.UserDetails UD on UD.Id=US.Id
 where UD.Idc='4850147' and EG.Id=2260
+
+
+
+CREATE PROCEDURE GetUserData
+    @UDId INT,
+    @EGId INT
+AS
+BEGIN
+    SELECT UD.Id, UD.Name AS UserName, CM.Name AS CompanyName, CM.Idc AS IdcCompany, CM.TypeIdc AS TypeIdcComp, UD.Idc AS UserDetalleIdc,
+        UD.IdcType AS TypeIdcUserDet, EG.Name AS EconomiName, US.UserName, US.PasswordHash, US.SecurityStamp, EG.Id
+    FROM cw.Companies CM
+    INNER JOIN cw.Users US ON CM.Id = US.CompanyId
+    INNER JOIN cw.EconomicGroups EG ON EG.Id = CM.EconomicGroupId
+    INNER JOIN cw.UserDetails UD ON UD.Id = US.Id
+    WHERE UD.Idc = @UDId AND EG.Id = @EGId
+END
+
+
+
+CREATE PROCEDURE GetUserData
+    @UDId INT,
+    @EGId INT
+AS
+BEGIN
+    SELECT UD.Id, UD.Name AS UserName, CM.Name AS CompanyName, CM.Idc AS IdcCompany, CM.TypeIdc AS TypeIdcComp, UD.Idc AS UserDetalleIdc,
+        UD.IdcType AS TypeIdcUserDet, EG.Name AS EconomiName, US.UserName, US.PasswordHash, US.SecurityStamp, EG.Id
+    FROM cw.UserDetails UD
+    INNER JOIN cw.Users US ON UD.Id = US.Id
+    INNER JOIN cw.Companies CM ON US.CompanyId = CM.Id
+    INNER JOIN cw.EconomicGroups EG ON CM.EconomicGroupId = EG.Id
+    WHERE UD.Idc = @UDId AND EG.Id = @EGId
+END
