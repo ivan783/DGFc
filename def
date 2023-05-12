@@ -91,3 +91,24 @@ public class UserRepository
         return user;
     }
 }
+using Dapper;
+using System.Data.SqlClient;
+
+public class UserRepository
+{
+    private string connectionString = "tu_cadena_de_conexión";
+
+    public User GetUserByUserNameAndPassword(string userName, string passwordHash)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            var parameters = new { UserName = userName, PasswordHash = passwordHash };
+
+            string query = "cw.GetUserByUserNameAndPassword";
+
+            User user = connection.QueryFirstOrDefault<User>(query, parameters, commandType: System.Data.CommandType.StoredProcedure);
+
+            return user;
+        }
+    }
+}
