@@ -51,3 +51,43 @@ END;
             }
             return listUserAppMov;
         }
+using System.Data.SqlClient;
+
+public class UserRepository
+{
+    private string connectionString = "tu_cadena_de_conexión";
+
+    public User GetUserByUserNameAndPassword(string userName, string passwordHash)
+    {
+        User user = null;
+
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            string query = "SELECT * FROM [cw].[Users] WHERE [UserName] = @UserName AND [PasswordHash] = @PasswordHash";
+
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@UserName", userName);
+                command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        user = new User
+                        {
+                            Id = (int)reader["Id"],
+                            UserName = (string)reader["UserName"],
+                            PasswordHash = (string)reader["PasswordHash"]
+                            // Agrega aquí cualquier otro campo que necesites
+                        };
+                    }
+                }
+            }
+        }
+
+        return user;
+    }
+}
