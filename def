@@ -136,3 +136,32 @@ public class UserRepository
     [Telephone]          VARCHAR (10)    DEFAULT ('') NULL,
     [IsValidBatchToken]  BIT             DEFAULT ((0)) NOT NULL,
     [AuthorizeApi]       BIT             CONSTRAINT [DF_Companies_AuthorizeApi] DEFAULT ((1)) NOT NULL,
+using System;
+
+namespace YourNamespace
+{
+    public class Companies
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Idc { get; set; }
+        public char TypeIdc { get; set; }
+        public string ExtensionIdc { get; set; }
+        public string ComplementIdc { get; set; }
+        public decimal DailyLimit { get; set; }
+        public bool DebitOrder { get; set; }
+        public bool AuthorizePin { get; set; }
+        public bool AuthorizeFtp { get; set; }
+        public bool IsSignature { get; set; }
+        public int EconomicGroupId { get; set; }
+        public string UserCreation { get; set; }
+        public string UserModification { get; set; }
+        public DateTime DateCreation { get; set; }
+        public DateTime? DateModification { get; set; }
+        public bool IsDeleted { get; set; }
+        public bool AuthorizeOperation { get; set; }
+        public string Telephone { get; set; }
+        public bool IsValidBatchToken { get; set; }
+        public bool AuthorizeApi { get; set; }
+    }
+}
