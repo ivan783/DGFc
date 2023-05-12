@@ -112,3 +112,27 @@ public class UserRepository
         }
     }
 }
+
+
+[cw].[Companies] (
+    [Id]                 INT             IDENTITY (1, 1) NOT NULL,
+    [Name]               NVARCHAR (4000) NOT NULL,
+    [Idc]                NVARCHAR (12)   NOT NULL,
+    [TypeIdc]            NCHAR (1)       NOT NULL,
+    [ExtensionIdc]       NCHAR (3)       NULL,
+    [ComplementIdc]      NCHAR (10)      NULL,
+    [DailyLimit]         DECIMAL (18, 2) NOT NULL,
+    [DebitOrder]         BIT             NOT NULL,
+    [AuthorizePin]       BIT             NOT NULL,
+    [AuthorizeFtp]       BIT             NOT NULL,
+    [IsSignature]        BIT             NOT NULL,
+    [EconomicGroupId]    INT             NOT NULL,
+    [UserCreation]       NVARCHAR (6)    NOT NULL,
+    [UserModification]   NVARCHAR (6)    NULL,
+    [DateCreation]       DATETIME        NOT NULL,
+    [DateModification]   DATETIME        NULL,
+    [IsDeleted]          BIT             NOT NULL,
+    [AuthorizeOperation] BIT             DEFAULT ((0)) NOT NULL,
+    [Telephone]          VARCHAR (10)    DEFAULT ('') NULL,
+    [IsValidBatchToken]  BIT             DEFAULT ((0)) NOT NULL,
+    [AuthorizeApi]       BIT             CONSTRAINT [DF_Companies_AuthorizeApi] DEFAULT ((1)) NOT NULL,
