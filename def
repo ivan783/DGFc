@@ -33,3 +33,21 @@ BEGIN
     WHERE [UserName] = @UserName
         AND [PasswordHash] = @PasswordHash;
 END;
+
+
+ public async Task<RespUserAuth> GetRespAuth()
+        {
+            var listUserAppMov = await Task.Run(() =>
+            {
+                return Context.SetData<RespUserAuth>("cw.GetUserByUserNameAndPassword @UserName",
+                    new SqlParameter[]{
+                            new SqlParameter("@UserName", "")
+                    }).ToList();
+            });
+            foreach (var item in listUserAppMov)
+            {/*
+                economicId = item.EconomicGroupId;
+                idcUserDet = item.UserDetailIdc;*/
+            }
+            return listUserAppMov;
+        }
