@@ -58,3 +58,17 @@ select * from cw.NewSessionApps
 WHERE Idc=@Idc
 AND CardNumber =@CardNumber
 and IdDivece=@IdDivece
+CREATE PROCEDURE [cw].[GetNewSessionApps]
+    @Idc NVARCHAR(MAX),
+    @CardNumber NVARCHAR(16),
+    @IdDivece NVARCHAR(256)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM cw.NewSessionApps
+    WHERE Idc = @Idc
+        AND CardNumber = @CardNumber
+        AND IdDivece = @IdDivece;
+END
