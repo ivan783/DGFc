@@ -72,3 +72,4 @@ BEGIN
         AND CardNumber = @CardNumber
         AND IdDivece = @IdDivece;
 END
+Could not load type 'System.ComponentModel.DataAnnotations.AssociatedMetadataTypeTypeDescriptionProvider' from assembly 'System.ComponentModel.DataAnnotations, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.
