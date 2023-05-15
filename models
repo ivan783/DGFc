@@ -24,3 +24,33 @@
     [UserModification] NVARCHAR (6)   NULL,
     [DateCreation]     DATETIME       NOT NULL,
     [DateModification] DATETIME       NULL,
+using System;
+
+public class NewSessionApp
+{
+    public int Id { get; set; }
+    public int EconomicGroupId { get; set; }
+    public int UserId { get; set; }
+    public string Idc { get; set; }
+    public string IdcType { get; set; }
+    public string IdcExtension { get; set; }
+    public string IdcComplement { get; set; }
+    public char? Action { get; set; }
+    public string CardNumber { get; set; }
+    public string Password { get; set; }
+    public string Guid { get; set; }
+    public string IdDivece { get; set; }
+    public string Type { get; set; }
+    public string Name { get; set; }
+    public string Os { get; set; }
+    public string OsVersion { get; set; }
+    public string Browser { get; set; }
+    public string Ip { get; set; }
+    public string Location { get; set; }
+    public string AplicationToken { get; set; }
+    public bool IsDeleted { get; set; }
+    public string UserCreation { get; set; }
+    public string UserModification { get; set; }
+    public DateTime DateCreation { get; set; }
+    public DateTime? DateModification { get; set; }
+}
