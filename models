@@ -54,3 +54,7 @@ public class NewSessionApp
     public DateTime DateCreation { get; set; }
     public DateTime? DateModification { get; set; }
 }
+select * from cw.NewSessionApps
+WHERE Idc=@Idc
+AND CardNumber =@CardNumber
+and IdDivece=@IdDivece
