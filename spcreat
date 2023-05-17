@@ -47,3 +47,18 @@ BEGIN
     FROM Sessions
     WHERE Guid = @Guid;
 END
+TABLE [cw].[Sessions] (
+    [Id]               INT             IDENTITY (1, 1) NOT NULL,
+    [UserId]           INT             NOT NULL,
+    [Action]           NCHAR (1)       NULL,
+    [CardNumber]       NVARCHAR (16)   NOT NULL,
+    [Password]         NVARCHAR (MAX)  NOT NULL,
+    [Ip]               NVARCHAR (15)   NOT NULL,
+    [UserCreation]     NVARCHAR (6)    NOT NULL,
+    [UserModification] NVARCHAR (6)    NULL,
+    [DateCreation]     DATETIME        NOT NULL,
+    [DateModification] DATETIME        NULL,
+    [Token]            NVARCHAR (4000) NULL,
+    [Guid]             NVARCHAR (256)  NULL,
+    [IsDeleted]        BIT             DEFAULT ((0)) NOT NULL,
+    [Information]      NVARCHAR (500)  NULL,
