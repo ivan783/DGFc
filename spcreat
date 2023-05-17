@@ -22,3 +22,12 @@ BEGIN
         AND DateCreation >= CAST(@PreviewDate AS DATETIME)
         AND DateCreation < DATEADD(DAY, 1, CAST(@CurrentDate AS DATETIME));
 END
+
+
+var session = this.ctx.Sessions.Where(x => x.Guid == guid && !x.IsDeleted).FirstOrDefault();
+            if (session != null)
+            {
+                session.Token = jwt;
+                this.ctx.SaveChanges();
+            }
+            return session;
