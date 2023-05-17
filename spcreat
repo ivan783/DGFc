@@ -31,3 +31,19 @@ var session = this.ctx.Sessions.Where(x => x.Guid == guid && !x.IsDeleted).First
                 this.ctx.SaveChanges();
             }
             return session;
+CREATE PROCEDURE UpdateSessionToken
+    @Guid uniqueidentifier,
+    @JWT varchar(500)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE s
+    SET Token = @JWT
+    FROM Sessions AS s
+    WHERE s.Guid = @Guid AND s.IsDeleted = 0;
+
+    SELECT *
+    FROM Sessions
+    WHERE Guid = @Guid;
+END
