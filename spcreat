@@ -77,3 +77,28 @@ ON [cw].[Sessions] ([CardNumber]);
 -- Índice para la columna Guid
 CREATE NONCLUSTERED INDEX IX_Sessions_Guid
 ON [cw].[Sessions] ([Guid]);
+-- Verificar si el índice para la columna CardNumber ya existe
+IF NOT EXISTS (
+    SELECT *
+    FROM sys.indexes
+    WHERE object_id = OBJECT_ID('[cw].[Sessions]')
+        AND name = 'IX_Sessions_CardNumber'
+)
+BEGIN
+    -- Crear el índice para la columna CardNumber
+    CREATE NONCLUSTERED INDEX IX_Sessions_CardNumber
+    ON [cw].[Sessions] ([CardNumber]);
+END
+
+-- Verificar si el índice para la columna Guid ya existe
+IF NOT EXISTS (
+    SELECT *
+    FROM sys.indexes
+    WHERE object_id = OBJECT_ID('[cw].[Sessions]')
+        AND name = 'IX_Sessions_Guid'
+)
+BEGIN
+    -- Crear el índice para la columna Guid
+    CREATE NONCLUSTERED INDEX IX_Sessions_Guid
+    ON [cw].[Sessions] ([Guid]);
+END
