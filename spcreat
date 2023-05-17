@@ -1,0 +1,5 @@
+(from ss in ctx.Sessions
+                       where ss.CardNumber == user.UserName &&
+                       (DbFunctions.TruncateTime(ss.DateCreation) >= DbFunctions.TruncateTime(previewDate) &&
+                       DbFunctions.TruncateTime(ss.DateCreation) <= DbFunctions.TruncateTime(currentDate))
+                       select ss)
