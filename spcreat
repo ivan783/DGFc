@@ -8,3 +8,17 @@
                        (DbFunctions.TruncateTime(ss.DateCreation) >= DbFunctions.TruncateTime(previewDate) &&
                        DbFunctions.TruncateTime(ss.DateCreation) <= DbFunctions.TruncateTime(currentDate))
                        select ss).ToList()
+CREATE PROCEDURE GetSessionsByCardNumber
+    @CardNumber VARCHAR(50),
+    @PreviewDate DATE,
+    @CurrentDate DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM Sessions
+    WHERE CardNumber = @CardNumber
+        AND DateCreation >= CAST(@PreviewDate AS DATETIME)
+        AND DateCreation < DATEADD(DAY, 1, CAST(@CurrentDate AS DATETIME));
+END
