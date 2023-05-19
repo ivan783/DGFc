@@ -199,3 +199,18 @@ The data reader is incompatible with the specified 'BCP.CredinetWeb.Functions.QR
     </div>
   </div>
 </div>
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-tu-componente',
+  templateUrl: './tu-componente.component.html',
+  styleUrls: ['./tu-componente.component.css']
+})
+export class TuComponenteComponent {
+  password: string;
+  inputType: string = 'password';
+
+  toggleShowPassword() {
+    this.inputType = (this.inputType === 'password') ? 'text' : 'password';
+  }
+}
