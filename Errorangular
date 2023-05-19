@@ -187,3 +187,15 @@ END
 
 The data reader is incompatible with the specified 'BCP.CredinetWeb.Functions.QR.Business.BranchQRPayment'. A member of the type, 'BranchCode', does not have a corresponding column in the data reader with the same name.
 
+<div class="form-group">
+  <label for="password">Contraseña</label>
+  <div class="input-group">
+    <input [type]="inputType" class="form-control" id="password" [(ngModel)]="password">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" type="button" (click)="toggleShowPassword()">
+        <span *ngIf="inputType === 'password'">Mostrar</span>
+        <span *ngIf="inputType === 'text'">Ocultar</span>
+      </button>
+    </div>
+  </div>
+</div>
