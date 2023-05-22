@@ -73,3 +73,48 @@ BEGIN
         AND IdDivece = @IdDivece;
 END
 Could not load type 'System.ComponentModel.DataAnnotations.AssociatedMetadataTypeTypeDescriptionProvider' from assembly 'System.ComponentModel.DataAnnotations, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'.
+CREATE PROCEDURE [dbo].[GetVoucherDetailACH]
+    @ProcessBatchId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        payment.ProcessBatchId,
+        payment.BankDescription AS DestinationBank,
+        account.FormattedAccount AS FormattedAccount,
+        payment.TargetAccount AS DestinationAccount,
+        payment.Beneficiary,
+        payment.InstruccionsAch AS Instructions,
+        payment.Details AS Detail,
+        status.Description AS State,
+        status.StatusCode AS StatusCode,
+        payment.Amount,
+        payment.Description AS Description,
+        payment.Line,
+        payment.ServiceCode,
+        payment.BanksAchCode AS BankCode,
+        account.Type AS TypePayment,
+        CASE
+            WHEN payment.ProcessBatch.Currency = 'BOL' THEN 'Bolivianos Extended'
+            ELSE 'USD Extended'
+        END AS Currency,
+        payment.ProcessBatch.Currency AS CurrencyCod,
+        payment.DebitHostOperation,
+        operationType.Name AS OperationType,
+        payment.OperationStatusId,
+        payment.ProcessMessage,
+        payment.DocumentType,
+        payment.DocumentNumber,
+        payment.DocumentExtension,
+        payment.ProcessBatch.IsMultipleDebits AS IsMultipleDebts,
+        payment.ProcessMessage AS Message
+    FROM
+        [cw].[MassPaymentInterBankTransfers] AS payment
+        INNER JOIN [cw].[ProcessBatchTable] AS processBatch ON payment.ProcessBatchId = processBatch.Id
+        INNER JOIN [cw].[AccountTable] AS account ON processBatch.AccountId = account.Id
+        INNER JOIN [cw].[OperationStatusTable] AS status ON payment.OperationStatusId = status.Id
+        INNER JOIN [cw].[OperationTypeTable] AS operationType ON processBatch.OperationTypeId = operationType.Id
+    WHERE
+        payment.ProcessBatchId = @ProcessBatchId;
+END
