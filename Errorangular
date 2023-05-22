@@ -239,3 +239,35 @@ public class MyModel
     public DateTime? DateModification { get; set; }
     public bool IsDeleted { get; set; }
 }
+
+(from payment in contextUsing.massPaymentInterBankTransfers
+                              where payment.ProcessBatchId == dto.Id
+                              select new VoucherDetailACH
+                              {
+                                  ProcessBatchId = payment.ProcessBatchId,
+                                  DestinationBank = payment.BankDescription,
+                                  FormattedAccount = payment.ProcessBatch.Account.FormattedAccount,
+                                  DestinationAccount = payment.TargetAccount,
+                                  Beneficiary = payment.Beneficiary,
+                                  Instructions = payment.InstruccionsAch,
+                                  Detail = payment.Details,
+                                  State = payment.OperationStatus.Description,
+                                  StatusCode = payment.OperationStatus.StatusCode,
+                                  Amount = payment.Amount,
+                                  Description = payment.Description.Trim(),
+                                  Line = payment.Line,
+                                  ServiceCode = payment.ServiceCode,
+                                  BankCode = payment.BanksAchCode,
+                                  TypePayment = payment.ProcessBatch.Account.Type,
+                                  Currency = payment.ProcessBatch.Currency == BaseConstants.CURRENCY_BOL ? BaseConstants.CURRENCY_BOL_EXTENDED : BaseConstants.CURRENCY_USD_EXTENDED,
+                                  CurrencyCod = payment.ProcessBatch.Currency,
+                                  DebitHostOperation = payment.DebitHostOperation,
+                                  OperationType = payment.ProcessBatch.OperationType.Name,
+                                  OperationStatusId = payment.OperationStatusId,
+                                  ProcessMessage = payment.ProcessMessage,
+                                  DocumentType = payment.DocumentType,
+                                  DocumentNumber = payment.DocumentNumber,
+                                  DocumentExtension = payment.DocumentExtension,
+                                  IsMultipleDebts = payment.ProcessBatch.IsMultipleDebits,
+                                  Message = payment.ProcessMessage
+                              })
