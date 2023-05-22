@@ -226,3 +226,16 @@ export class TuComponenteComponent {
     [DateCreation]     DATETIME      NOT NULL,
     [DateModification] DATETIME      NULL,
     [IsDeleted]        BIT           NOT NULL,
+public class MyModel
+{
+    public int Id { get; set; }
+    public string Groups { get; set; }
+    public string Code { get; set; }
+    public string Value { get; set; }
+    public string Description { get; set; }
+    public string UserCreation { get; set; }
+    public string UserModification { get; set; }
+    public DateTime DateCreation { get; set; }
+    public DateTime? DateModification { get; set; }
+    public bool IsDeleted { get; set; }
+}
