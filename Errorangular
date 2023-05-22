@@ -214,3 +214,15 @@ export class TuComponenteComponent {
     this.inputType = (this.inputType === 'password') ? 'text' : 'password';
   }
 }
+
+[Parameters] (
+    [Id]               INT           IDENTITY (1, 1) NOT NULL,
+    [Groups]           NVARCHAR (6)  NOT NULL,
+    [Code]             NVARCHAR (6)  NOT NULL,
+    [Value]            NVARCHAR (8)  NOT NULL,
+    [Description]      NVARCHAR (80) NOT NULL,
+    [UserCreation]     NVARCHAR (6)  NOT NULL,
+    [UserModification] NVARCHAR (6)  NULL,
+    [DateCreation]     DATETIME      NOT NULL,
+    [DateModification] DATETIME      NULL,
+    [IsDeleted]        BIT           NOT NULL,
