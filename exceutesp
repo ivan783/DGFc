@@ -1,0 +1,13 @@
+ELSE IF @Option='UPDATE'
+    BEGIN
+        UPDATE [cw].[BusinessQRPayments]
+        SET
+            CompanyId = @CompanyId,
+            BusinessCode = @BusinessCode,
+            Abreviation = @Abreviation,
+            UserModification = @UserModification,
+            DateModification = GETDATE(),
+            IsDeleted = @IsDeleted
+        WHERE
+            Id = @Id;
+    END
