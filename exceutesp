@@ -36,3 +36,105 @@ public byte[] GetReport(ProcessBatchIdDto dto)
                 "  </DeviceInfo>";
             return report.Render("pdf", devicInfo);
         }
+public byte[] GetReport(ProcessBatchIdDto dto)
+{
+    var detail = GetDetail(Get(dto.ProcessBatchId));
+
+    var reportPath = Context.Parameters
+        .FirstOrDefault(x => x.Groups == BaseConstants.REPORT_GROUP && x.Code == BaseConstants.REPORT_CODE)?
+        .Description;
+
+    if (reportPath == null)
+    {
+        throw new Exception("Report path not found.");
+    }
+
+    var report = new LocalReport
+    {
+        ReportPath = string.Concat(reportPath, configuration.GetSection("Reports")["ManualPayments"])
+    };
+
+    report.DataSources.Add(new ReportDataSource("ManualPaymentResult", new List<BatchDetailResult> { detail.BatchDetail }));
+    report.DataSources.Add(new ReportDataSource("ManualPaymentDetail", detail.PaymentDetail));
+
+    string deviceInfo =
+        "  <DeviceInfo>" +
+        "  <OutputFormat>PDF</OutputFormat>" +
+        "  <PageWidth>11in</PageWidth>" +
+        "  <PageHeight>8in</PageHeight>" +
+        "  <MarginTop>0.5in</MarginTop>" +
+        "  <MarginLeft>0.5in</MarginLeft>" +
+        "  <MarginRight>0.5in</MarginRight>" +
+        "  <MarginBottom>0.5in</MarginBottom>" +
+        "  </DeviceInfo>";
+
+    return report.Render("pdf", deviceInfo);
+}
+public byte[] GetReport(ProcessBatchIdDto dto)
+{
+    var detail = GetDetail(Get(dto.ProcessBatchId));
+
+    var reportPath = Context.Parameters
+        .FirstOrDefault(x => x.Groups == BaseConstants.REPORT_GROUP && x.Code == BaseConstants.REPORT_CODE)?
+        .Description;
+
+    if (reportPath == null)
+    {
+        throw new Exception("Report path not found.");
+    }
+
+    var report = new LocalReport
+    {
+        ReportPath = string.Concat(reportPath, configuration.GetSection("Reports")["ManualPayments"])
+    };
+
+    report.DataSources.Add(new ReportDataSource("ManualPaymentResult", new List<BatchDetailResult> { detail.BatchDetail }));
+    report.DataSources.Add(new ReportDataSource("ManualPaymentDetail", detail.PaymentDetail));
+
+    string deviceInfo =
+        "  <DeviceInfo>" +
+        "  <OutputFormat>PDF</OutputFormat>" +
+        "  <PageWidth>11in</PageWidth>" +
+        "  <PageHeight>8in</PageHeight>" +
+        "  <MarginTop>0.5in</MarginTop>" +
+        "  <MarginLeft>0.5in</MarginLeft>" +
+        "  <MarginRight>0.5in</MarginRight>" +
+        "  <MarginBottom>0.5in</MarginBottom>" +
+        "  </DeviceInfo>";
+
+    return report.Render("pdf", deviceInfo);
+}
+public byte[] GetReport(ProcessBatchIdDto dto)
+{
+    var detail = GetDetail(Get(dto.ProcessBatchId));
+
+    var reportPath = Context.Parameters
+        .FirstOrDefault(x => x.Groups == BaseConstants.REPORT_GROUP && x.Code == BaseConstants.REPORT_CODE)?
+        .Description;
+
+    if (reportPath == null)
+    {
+        throw new Exception("Report path not found.");
+    }
+
+    var report = new LocalReport
+    {
+        ReportPath = string.Concat(reportPath, configuration.GetSection("Reports")["ManualPayments"])
+    };
+
+    report.DataSources.Add(new ReportDataSource("ManualPaymentResult", new List<BatchDetailResult> { detail.BatchDetail }));
+    report.DataSources.Add(new ReportDataSource("ManualPaymentDetail", detail.PaymentDetail));
+
+    string deviceInfo =
+        "  <DeviceInfo>" +
+        "  <OutputFormat>PDF</OutputFormat>" +
+        "  <PageWidth>11in</PageWidth>" +
+        "  <PageHeight>8in</PageHeight>" +
+        "  <MarginTop>0.5in</MarginTop>" +
+        "  <MarginLeft>0.5in</MarginLeft>" +
+        "  <MarginRight>0.5in</MarginRight>" +
+        "  <MarginBottom>0.5in</MarginBottom>" +
+        "  </DeviceInfo>";
+
+    return report.Render("pdf", deviceInfo);
+}
