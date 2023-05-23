@@ -14,3 +14,25 @@ ELSE IF @Option='UPDATE'
 Microsoft.Reporting.WebForms.LocalProcessingException: 'An error occurred during local report processing.'
 
 NullReferenceException: Object reference not set to an instance of an object.
+public byte[] GetReport(ProcessBatchIdDto dto)
+        {
+            var detail = GetDetail(Get(dto.ProcessBatchId));
+            var report = new LocalReport
+            {
+                ReportPath = string.Concat(Context.Parameters.Where(x => x.Groups == BaseConstants.REPORT_GROUP && x.Code == BaseConstants.REPORT_CODE).First().Description,
+                    configuration.GetSection("Reports")["ManualPayments"])
+            };
+            report.DataSources.Add(new ReportDataSource("ManualPaymentResult", new List<BatchDetailResult> { detail.BatchDetail }));
+            report.DataSources.Add(new ReportDataSource("ManualPaymentDetail",  detail.PaymentDetail ));
+            string devicInfo =
+                "  <DeviceInfo>" +
+                "  <OutputFormat>PDF</OutputFormat>" +
+                "  <PageWidth>11in</PageWidth>" +
+                "  <PageHeight>8in</PageHeight>" +
+                "  <MarginTop>0.5in</MarginTop>" +
+                "  <MarginLeft>0.5in</MarginLeft>" +
+                "  <MarginRight>0.5in</MarginRight>" +
+                "  <MarginBottom>0.5in</MarginBottom>" +
+                "  </DeviceInfo>";
+            return report.Render("pdf", devicInfo);
+        }
