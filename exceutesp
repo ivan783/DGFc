@@ -159,3 +159,21 @@ private ManualPaymentDetailResult GetDetail(ProcessBatch batch)
             }
             return result;
         }
+private ManualPaymentDetailResult GetDetail(ProcessBatch batch)
+{
+    var result = new ManualPaymentDetailResult { BatchDetail = mapper.Map<BatchDetailResult>(batch) };
+
+    result.PaymentDetail = batch.OperationTypeId switch
+    {
+        BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA or
+        BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA_LIP =>
+            mapper.Map<List<PaymentDetail>>(batch.ProvidersCheckManagements),
+        BaseConstants.OPERATION_PAGO_PROVEEDORES_OTROS_BANCOS_CHEQUE =>
+            mapper.Map<List<PaymentDetail>>(batch.ProvidersDepositOtherBankChecks),
+        BaseConstants.OPERATION_PAGO_IMPUESTO_GERENCIA =>
+            mapper.Map<List<PaymentDetail>>(batch.PaymentTaxChecks),
+        _ => null
+    };
+
+    return result;
+}
