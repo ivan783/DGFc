@@ -11,3 +11,6 @@ ELSE IF @Option='UPDATE'
         WHERE
             Id = @Id;
     END
+Microsoft.Reporting.WebForms.LocalProcessingException: 'An error occurred during local report processing.'
+
+NullReferenceException: Object reference not set to an instance of an object.
