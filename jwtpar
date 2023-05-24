@@ -273,3 +273,9 @@ private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest bas
 
     return currentRequest;
 }
+
+
+SELECT DATE(tu_columna_fecha) AS dia, COUNT(*) AS cantidad_registros, AVG(tu_columna_valor) AS promedio_valor
+FROM tu_tabla
+GROUP BY dia
+ORDER BY dia;
