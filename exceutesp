@@ -277,3 +277,26 @@ private ManualPaymentDetailResult GetDetail(ProcessBatch batch)
 
     return result;
 }
+public async Task<Response> ProcesarRegistrosAsync(List<Registro> registros)
+{
+    List<Task> tareas = new List<Task>();
+
+    foreach (var registro in registros)
+    {
+        Task tarea = EnviarRegistroAsync(registro);
+        tareas.Add(tarea);
+    }
+
+    await Task.WhenAll(tareas);
+
+    // Aquí puedes realizar cualquier procesamiento adicional o retorno de resultados
+
+    return new Response { Success = true, Message = "Registros procesados correctamente" };
+}
+
+private async Task EnviarRegistroAsync(Registro registro)
+{
+    HttpResponseMessage response = await httpClient.PostAsync(url, contenido);
+    // Procesar la respuesta de la API si es necesario
+    // ...
+}
