@@ -378,3 +378,89 @@ private GetDBFDMonitorRequest ConvertToGetDBFDMonitorRequest(GetDBFDMonitorReque
         FechaHoraTransaccion = requestModel.FechaHoraTransaccion,
         UsuarioAutorizador = requestModel.UsuarioAutorizador,
 
+
+
+
+protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+{
+    try
+    {
+        // ...
+
+        var batchLote = 20;
+        var partitions = Partitioner.Create(dto.Spreadsheet).GetPartitions(batchLote);
+
+        Parallel.ForEach(partitions, (partition) =>
+        {
+            var batch = new List<GetDBFDMonitorRequestModel>();
+            while (partition.MoveNext())
+            {
+                var registro = partition.Current;
+                var requestModel = ConvertToGetDBFDMonitorRequestModel(registro);
+                batch.Add(requestModel);
+            }
+
+            EnviarRegistros(batch);
+        });
+
+        // ...
+
+        return Result<GetDBFDMonitorResponse>.SetOk(response);
+    }
+    catch (Exception ex)
+    {
+        // ...
+        return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+    }
+}
+
+private void EnviarRegistros(List<GetDBFDMonitorRequestModel> registros)
+{
+    Parallel.ForEach(registros, (registro) =>
+    {
+        GetDBFDMonitorRequest request = ConvertToGetDBFDMonitorRequest(registro);
+
+        var response = manager.GetDBFDMonitor(request);
+        // Procesar la respuesta de la API si es necesario
+        // ...
+    });
+}
+
+private GetDBFDMonitorRequestModel ConvertToGetDBFDMonitorRequestModel(Registro registro)
+{
+    // Realiza la conversión de Registro a GetDBFDMonitorRequestModel
+    // y configura las propiedades correspondientes
+    var requestModel = new GetDBFDMonitorRequestModel
+    {
+        SourceAccount = registro.SourceAccount,
+        TargetAccount = registro.TargetAccount,
+        Beneficiary = registro.Beneficiary,
+        Mail = registro.Mail,
+        BanksAchCode = registro.BanksAchCode,
+        Amount = registro.Amount,
+        // Configura otras propiedades necesarias en el request
+    };
+
+    return requestModel;
+}
+
+private GetDBFDMonitorRequest ConvertToGetDBFDMonitorRequest(GetDBFDMonitorRequestModel requestModel)
+{
+    // Realiza la conversión de GetDBFDMonitorRequestModel a GetDBFDMonitorRequest
+    // y configura las propiedades correspondientes en el request
+    var request = new GetDBFDMonitorRequest
+    {
+        FechaHoraTransaccion = requestModel.FechaHoraTransaccion,
+        UsuarioAutorizador = requestModel.UsuarioAutorizador,
+        SourceAccount = requestModel.SourceAccount,
+        TargetAccount = requestModel.TargetAccount,
+        Beneficiary = requestModel.Beneficiary,
+        Mail = requestModel.Mail,
+        BanksAchCode = requestModel.BanksAchCode,
+        Amount = requestModel.Amount,
+        // Configura otras propiedades necesarias en el request
+    };
+
+    return request;
+}
+
