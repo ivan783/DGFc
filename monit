@@ -102,3 +102,66 @@ protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBa
 
             }
         }
+
+ protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+        {
+            try { 
+                logger.LogError($"-----Iniciando el Monitoreo: {DateTime.Now.ToString("yyyyMMddHHmmss")}------------");
+                GetDBFDMonitorRequest request = new GetDBFDMonitorRequest();
+                GetDBFDMonitorResponse response = new GetDBFDMonitorResponse();
+                GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+                
+                 var reult = Result<GetDBFDMonitorResponse>.SetOk(response);
+                 request.DatosReto = "";
+                request.PreguntasReto = "S";
+                request.RespuestasCorrectas = "S";
+                request.OrigenTransaccion = "WEB-JS";
+                request.CodigoRespuestaHost = "00";
+                request.LocalInternacional = "L";
+                 foreach (var j in dto.Spreadsheet)
+                {
+                
+                    request.FechaHoraTransaccion = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    //request.IpSolicitud = (string.IsNullOrEmpty(dto.Ip) || dto.Ip.Length >= 16) ? "172.31.4.227" : dto.Ip;
+                    request.UsuarioAutorizador = this.UserId.ToString();
+                    request.FechaAperturaCuenta = resAccounts.DateCreation.ToString("yyyyMMdd");
+                    request.MonedaTransaccion = processBatch.Currency.Trim();
+                    request.ImporteTransaccion = j.Amount;
+                    request.TipoCambio = typeMon;
+                    request.NombreClienteOrigen = resRepex.Body.Client;
+                    request.CuentaDestino = j.TargetAccount; 
+                    request.NombreClienteDestino = j.Beneficiary;
+                    request.EmailCuentaDestino = j.Mail.Length > 40 ? j.Mail.Trim().Substring(0, Math.Min(40, j.Mail.Trim().Length)) : j.Mail;
+                    request.BancoDestino = j.BanksAchCode;
+                    request.NumeroTransaccionTrace = GetTrace();
+                    request.SessionId = userName.Trim().Substring(10, Math.Min(6, userName.Trim().Length)) + DateTime.Now.ToString("yyyyMMddHHmmss");
+                    var aux = JsonConvert.SerializeObject(request);
+    //                logger.LogError($"Request: {aux}");
+                    response = this.manager.GetDBFDMonitor(request);
+                    var aux1 = JsonConvert.SerializeObject(response?.AnswerCode);
+                    var aux2 = JsonConvert.SerializeObject(response?.AnswerMessage);
+                    var aux3 = JsonConvert.SerializeObject(response?.MonitorResponse?.Message);
+
+                    reult = Result<GetDBFDMonitorResponse>.SetOk(response);
+
+                    if (reult.Body.AnswerCode != "00")
+                    {
+                        logger.LogError($"Request: ----{aux}-----");
+                        var operationStatusError = 8;
+                        processBatch.OperationStatusId = operationStatusError;
+                        logger.LogError($"Response: ----{aux1}--__--{aux2}----");
+                        logger.LogError($"ResponseDetalle: ----{aux3}-----");
+                        logger.LogError($"------Fin de monitoreo con observaciones: {DateTime.Now.ToString("yyyyMMddHHmmss")}-----");
+                        return reult;
+                    }
+                }
+                logger.LogError($"------Fin de monitoreo sin observaciones: {DateTime.Now.ToString("yyyyMMddHHmmss")}-----");
+                return reult;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error al obtener monitoreo: {ex.Message}");
+                return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+
+            }
+        }
