@@ -165,3 +165,47 @@ protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBa
 
             }
         }
+
+
+
+protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+{
+    try
+    {
+        // ...
+
+        var batchLote = 20;
+        var tasks = new List<Task>();
+
+        for (var i = 0; i < dto.Spreadsheet.Count; i += batchLote)
+        {
+            var batch = dto.Spreadsheet.Skip(i).Take(batchLote).ToList();
+            var task = EnviarRegistrosAsync(batch);
+            tasks.Add(task);
+        }
+
+        await Task.WhenAll(tasks);
+
+        // ...
+
+        return reult;
+    }
+    catch (Exception ex)
+    {
+        // ...
+        return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+    }
+}
+
+private async Task EnviarRegistrosAsync(List<Registro> registros)
+{
+    foreach (var registro in registros)
+    {
+        GetDBFDMonitorRequest request = new GetDBFDMonitorRequest();
+        // Configurar el request con los datos del registro
+
+        var response = await manager.GetDBFDMonitorAsync(request);
+        // Procesar la respuesta de la API si es necesario
+        // ...
+    }
+}
