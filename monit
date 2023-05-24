@@ -196,7 +196,99 @@ protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBa
         return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
     }
 }
+protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+{
+    try
+    {
+        // ...
 
+        var batchLote = 20;
+        var partitions = Partitioner.Create(dto.Spreadsheet).GetPartitions(batchLote);
+
+        Parallel.ForEach(partitions, (partition) =>
+        {
+            var batch = new List<Registro>();
+            while (partition.MoveNext())
+            {
+                var registro = partition.Current;
+                batch.Add(registro);
+            }
+
+            EnviarRegistros(batch);
+        });
+
+        // ...
+
+        return Result<GetDBFDMonitorResponse>.SetOk(response);
+    }
+    catch (Exception ex)
+    {
+        // ...
+        return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+    }
+}
+
+private void EnviarRegistros(List<Registro> registros)
+{
+    foreach (var registro in registros)
+    {
+        GetDBFDMonitorRequest request = new GetDBFDMonitorRequest();
+        // Configurar el request con los datos del registro
+
+        var response = manager.GetDBFDMonitor(request);
+        // Procesar la respuesta de la API si es necesario
+        // ...
+    }
+}
+
+
+
+
+
+protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+{
+    try
+    {
+        // ...
+
+        var batchLote = 20;
+        var partitions = Partitioner.Create(dto.Spreadsheet).GetPartitions(batchLote);
+
+        Parallel.ForEach(partitions, (partition) =>
+        {
+            var batch = new List<Registro>();
+            while (partition.MoveNext())
+            {
+                var registro = partition.Current;
+                batch.Add(registro);
+            }
+
+            EnviarRegistros(batch);
+        });
+
+        // ...
+
+        return Result<GetDBFDMonitorResponse>.SetOk(response);
+    }
+    catch (Exception ex)
+    {
+        // ...
+        return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+    }
+}
+
+private void EnviarRegistros(List<Registro> registros)
+{
+    foreach (var registro in registros)
+    {
+        GetDBFDMonitorRequest request = new GetDBFDMonitorRequest();
+        // Configurar el request con los datos del registro
+
+        var response = manager.GetDBFDMonitor(request);
+        // Procesar la respuesta de la API si es necesario
+        // ...
+    }
+}
 private async Task EnviarRegistrosAsync(List<Registro> registros)
 {
     foreach (var registro in registros)
@@ -209,3 +301,8 @@ private async Task EnviarRegistrosAsync(List<Registro> registros)
         // ...
     }
 }
+
+
+
+
+
