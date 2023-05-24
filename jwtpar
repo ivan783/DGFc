@@ -200,3 +200,76 @@ protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBa
         return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
     }
 }
+
+
+
+protected override Result<GetDBFDMonitorResponse> GetDBFDMonitorResult(ProcessBatch processBatch, PaymentAchDto dto)
+{
+    try
+    {
+        logger.LogError($"-----Iniciando el Monitoreo: {DateTime.Now.ToString("yyyyMMddHHmmss")}------------");
+
+        GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+        SetExchangeRates();
+        var userName = UserInfo.Identity.GetUserName();
+        requestRepex.AccountNumber = dto.SourceAccount;
+        var resRepex = repExtManager.GetAccountClient(requestRepex);
+
+        var results = new ConcurrentBag<GetDBFDMonitorResponse>();
+        var typeOpe = "";
+        decimal typeMon = 0;
+
+        var request = new GetDBFDMonitorRequest
+        {
+            RespuestasCorrectas = "S",
+            OrigenTransaccion = "WEB-JS",
+            CodigoRespuestaHost = "00"
+        };
+
+        Parallel.ForEach(dto.Spreadsheet, j =>
+        {
+            var currentRequest = CreateDBFDMonitorRequest(request, resRepex, userName, j);
+
+            var response = this.manager.GetDBFDMonitor(currentRequest);
+            results.Add(response);
+
+            if (response.Body.AnswerCode != "00")
+            {
+                logger.LogError($"Request: ----{JsonConvert.SerializeObject(currentRequest)}-----");
+                var operationStatusError = 8;
+                processBatch.OperationStatusId = operationStatusError;
+                logger.LogError($"Response: ----{JsonConvert.SerializeObject(response)}----");
+            }
+        });
+
+        var finalResult = Result<GetDBFDMonitorResponse>.SetOk(results.LastOrDefault() ?? new GetDBFDMonitorResponse());
+
+        return finalResult;
+    }
+    catch (Exception ex)
+    {
+        logger.LogError($"Error al obtener monitoreo: {ex.Message}");
+        return Result<GetDBFDMonitorResponse>.SetError("Error al obtener monitoreo");
+    }
+}
+
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, AccountClientResponse resRepex, string userName, SpreadsheetData j)
+{
+    var currentRequest = new GetDBFDMonitorRequest
+    {
+        RespuestasCorrectas = baseRequest.RespuestasCorrectas,
+        OrigenTransaccion = baseRequest.OrigenTransaccion,
+        CodigoRespuestaHost = baseRequest.CodigoRespuestaHost,
+        FechaHoraTransaccion = DateTime.Now.ToString("yyyyMMddHHmmss"),
+        UsuarioAutorizador = this.UserId.ToString(),
+        FechaAperturaCuenta = resRepex.DateCreation.ToString("yyyyMMdd"),
+        EmailCuentaDestino = j.Mail.Length > 40 ? j.Mail.Trim().Substring(0, Math.Min(40, j.Mail.Trim().Length)) : j.Mail,
+        BancoDestino = j.BanksAchCode,
+        NumeroTransaccionTrace = GetTrace(),
+        SessionId = userName.Trim().Substring(10, Math.Min(6, userName.Trim().Length)) + DateTime.Now.ToString("yyyyMMddHHmmss")
+    };
+
+    // Otros ajustes o configuraciones específicas del objeto currentRequest si es necesario
+
+    return currentRequest;
+}
