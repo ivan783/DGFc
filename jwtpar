@@ -286,3 +286,10 @@ FROM tu_tabla
 GROUP BY CONVERT(DATE, tu_columna_fecha)
 ORDER BY dia;
 
+SELECT CONVERT(DATE, tu_columna_fecha) AS dia, 
+       COUNT(*) AS cantidad_registros, 
+       AVG(tu_columna_valor) AS promedio_valor 
+FROM tu_tabla 
+WHERE tu_columna_fecha >= '2023-04-27' AND tu_columna_fecha <= '2023-05-04'
+GROUP BY CONVERT(DATE, tu_columna_fecha) 
+ORDER BY dia;
