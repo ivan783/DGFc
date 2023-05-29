@@ -1,1 +1,10 @@
 dcd
+
+buen dia , etsoy alistando estoy mandando estos datos , segun el ejemplo que dan , Y ESO E SLO QUE NOS DEVUELVE {"companyId":"2295","password":"pato123","documentNumber":"3879294013","documentType":"T","documentExtension":"SC","documentComplement":"","amount":"1","currency":"BOL","fundSource":"compras","fundDestination":"pago de servicios","sourceAccount":2011040905323,"sourceCurrency":"BOL","description":"transferencia realizada ","sendVouchers":"leonardo.ayala@pagofacil.com.bo","spreadsheet":{"formProvidersPayments":[{"paymentType":"PROV","line":"1","accountNumber":"2011040905323","glossPayment":"TRANSFERENCIA DE PRUEBA ","amount":"1","documentType":"Q","documentNumber":"11385389","documentExtension":"","firstDetail":"CUENTA  PRUEBA","secondDetail":"CUENTA PRUEBA 2","mail":"laionerplus@gmail.com"}],"formAchPayments":null,"formOddPayments":null}}
+no hay nada
+stdClass Object
+(
+    [isOk] => 
+    [message] => Los datos personales del usuario son incorrectas.
+    [body] => 
+)
