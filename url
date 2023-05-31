@@ -1,1 +1,12 @@
 https://devcwn01:444/APIAuthorization/api/APIAuthorization/ProcessBatches
+string url = "https://devcwn01:444/APIAuthorization/api/APIAuthorization/ProcessBatches";
+string palabraValidar = "APIAuthorization";
+
+if (url.Contains(palabraValidar))
+{
+    Console.WriteLine("La palabra está presente en la URL.");
+}
+else
+{
+    Console.WriteLine("La palabra no está presente en la URL.");
+}
