@@ -58,3 +58,16 @@ public class Result<BODY>
 
 Severity	Code	Description	Project	File	Line	Suppression State
 Error	CS0738	'AuthAppMovilBusiness' does not implement interface member 'IAuthAppMovilBusiness.GetAuthenticate(DeviceDto, string, string)'. 'AuthAppMovilBusiness.GetAuthenticate(DeviceDto, string, string)' cannot implement 'IAuthAppMovilBusiness.GetAuthenticate(DeviceDto, string, string)' because it does not have the matching return type of 'Result<AuthResult>'.	AuthAppMovil.Business	D:\Services_2023\CW_AUTH_APP_WES\Funtions\AuthAppMovil.Business\AuthAppMovilBusiness.cs	20	Active
+
+namespace BCP.CredinetWeb.Core.Business
+{
+    public class Result<BODY>
+    {
+        public bool IsOk { get; }
+        public string Message { get; }
+        public BODY Body { get; }
+
+        public static Result<BODY> SetError(string message);
+        public static Result<BODY> SetOk(BODY body);
+    }
+}
