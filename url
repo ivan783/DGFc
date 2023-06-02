@@ -86,3 +86,81 @@ public class CustomResult<BODY> : Result<BODY>
         Status = status; // Mantenemos el estado original de Result<BODY>
     }
 }
+
+namespace BCP.AuthAppMovil.Functions.AuthAppMovil.Business
+{
+    public class AuthAppMovilBusiness : BaseBusiness<ProcessBatch, AuthAppMovilContext>, IAuthAppMovilBusiness
+    {
+        ILogger<AuthAppMovilBusiness> logger;
+        string segCryptName;
+
+        public AuthAppMovilBusiness(AuthAppMovilContext context, IPrincipal userInfo, ILogger<AuthAppMovilBusiness> logger, IConfiguration configuration) : base(context, userInfo, configuration)
+        {
+            this.logger = logger;
+            if (string.IsNullOrEmpty(segCryptName))
+            {
+                segCryptName = configuration["SegCryptCW"];
+            }
+            LoaderSecrypt.LoadSegCrypt(segCryptName);
+        }
+
+        public Result<AuthResult> GetAuthenticate(DeviceDto dto, string username,string password)
+        {
+            AuthResult response = new AuthResult();
+            var urlAuth = configuration.GetSection("Connectors")["AddressJwt"];
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            var valueRender = configuration.GetSection("Render").Value;
+            var decUsername = LoaderSecrypt.EncryptDecrypt(false, username);
+            var decPassword = LoaderSecrypt.EncryptDecrypt(false, password);
+            var jsonRequest = JsonConvert.SerializeObject(dto);
+            logger.LogError($"Request Header user: {username}, pass: {password}");
+            logger.LogError($"Request Body: {jsonRequest}");
+            using (var httpClient = new HttpClient(httpClientHandler))
+            {
+                try
+                {
+                    HttpContent contentU = new FormUrlEncodedContent(
+                    new List<KeyValuePair<string, string>> {
+                        new KeyValuePair<string, string>("username", decUsername.ToString()),
+                        new KeyValuePair<string,string>("password",decPassword.ToString()),
+                        new KeyValuePair<string,string>("grant_type",System.Net.WebUtility.UrlEncode("password")),
+                        new KeyValuePair<string,string>("client_id",valueRender) }
+                    );
+
+                    contentU.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+                    contentU.Headers.ContentType.CharSet = "UTF-8";
+                    var responseToken = httpClient.PostAsync(new Uri(urlAuth), contentU).Result;
+                    var resultContentToken = responseToken.Content.ReadAsStringAsync().Result;
+                    logger.LogError($"Response JWT: {resultContentToken}");
+                    var result = JsonConvert.DeserializeObject<AuthResult>(resultContentToken);
+                    logger.LogError($"Error de auth: {result?.error_description}");
+                    if (!string.IsNullOrEmpty(result.access_token))
+                    {
+                        /*response.status = "00";
+                        response.message = "Sesión correcta.";
+                        response.data = result;*/
+
+                        response = result;
+
+                        var userList = Context.SqlQuery<SpNewSessionApp>("cw.SpGetNewSessionApps @Idc,@CardNumber,@IdDivece",
+                        new SqlParameter[]{
+                            new SqlParameter("@Idc", "4dvdsvxv"),
+                            new SqlParameter("@CardNumber", "4xcvxcv"),
+                            new SqlParameter("@IdDivece", "4xcvx")
+                        }).ToList();
+                    }
+                   
+                }
+                catch (Exception e)
+                {
+                    //logger.LogError($"Error en el servicio de autenticación: {e.ToString()}");
+                    //response.status = "99";
+                    //response.message = "Se produjo una excepción no controlada.";
+                    return Result<AuthResult>.SetOk(response);
+                }
+            }
+            return Result<AuthResult>.SetOk(response);
+        }
+
+    }
+}
