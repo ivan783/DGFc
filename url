@@ -71,3 +71,18 @@ namespace BCP.CredinetWeb.Core.Business
         public static Result<BODY> SetOk(BODY body);
     }
 }
+using BCP.CredinetWeb.Core.Business; // Importa el espacio de nombres de la DLL
+
+public class CustomResult<BODY> : Result<BODY>
+{
+    public int CustomStatus { get; private set; }
+    public string CustomMessage { get; private set; }
+
+    public CustomResult(bool isOk, string message, BODY body, int status, int customStatus, string customMessage)
+        : base(isOk, message, body)
+    {
+        CustomStatus = customStatus;
+        CustomMessage = customMessage;
+        Status = status; // Mantenemos el estado original de Result<BODY>
+    }
+}
