@@ -23,3 +23,35 @@ public class Result<BODY>
         public static Result<BODY> SetError(string message);
         public static Result<BODY> SetOk(BODY body);
     }
+public class Result<BODY>
+{
+    public bool IsOk { get; private set; }
+    public string Message { get; private set; }
+    public BODY Body { get; private set; }
+    public int Status { get; private set; }
+
+    private Result(bool isOk, string message, BODY body, int status)
+    {
+        IsOk = isOk;
+        Message = message;
+        Body = body;
+        Status = status;
+    }
+
+    public static Result<BODY> SetError(string message, int status)
+    {
+        return new Result<BODY>(false, message, default(BODY), status);
+    }
+
+    public static Result<BODY> SetOk(BODY body, int status)
+    {
+        return new Result<BODY>(true, string.Empty, body, status);
+    }
+
+    // Agrega tus propiedades y métodos personalizados aquí
+
+    public override string ToString()
+    {
+        return $"IsOk: {IsOk}, Message: {Message}, Body: {Body}, Status: {Status}";
+    }
+}
