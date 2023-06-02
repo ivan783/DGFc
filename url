@@ -10,3 +10,6 @@ else
 {
     Console.WriteLine("La palabra no está presente en la URL.");
 }
+
+
+https://teams.microsoft.com/l/meetup-join/19:meeting_YjRiZGI5YzUtOWY5Yy00NWNkLTgwZmYtZDc1ZTdmY2EwMGE1@thread.v2/0?context=%7B%22Tid%22:%225d93ebcc-f769-4380-8b7e-289fc972da1b%22,%22Oid%22:%220529f12d-8235-4745-ace6-d30af315cfc4%22%7D
