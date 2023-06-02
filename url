@@ -199,3 +199,35 @@ namespace BCP.AuthAppMovil.Functions.AuthAppMovil.Business
         // Resto del código de tu clase AuthAppMovilBusiness...
     }
 }
+
+
+using BCP.CredinetWeb.Core.Business;
+
+namespace TuNamespace
+{
+    public class CustomResultDecorator<BODY> : Result<BODY>
+    {
+        private Result<BODY> originalResult;
+        public int CustomStatus { get; private set; }
+        public string CustomMessage { get; private set; }
+
+        public CustomResultDecorator(Result<BODY> result, int customStatus, string customMessage)
+        {
+            originalResult = result;
+            CustomStatus = customStatus;
+            CustomMessage = customMessage;
+        }
+
+        // Aquí puedes implementar los miembros de la interfaz de la clase Result<BODY>
+        // y redirigir las llamadas a la instancia originalResult, agregando tu lógica personalizada si es necesario.
+
+        public override bool IsOk => originalResult.IsOk;
+        public override string Message => originalResult.Message;
+        public override BODY Body => originalResult.Body;
+
+        public override string ToString()
+        {
+            return $"IsOk: {IsOk}, Message: {Message}, Body: {Body}, Status: {CustomStatus}, CustomMessage: {CustomMessage}";
+        }
+    }
+}
