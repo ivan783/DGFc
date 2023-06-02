@@ -164,3 +164,38 @@ namespace BCP.AuthAppMovil.Functions.AuthAppMovil.Business
 
     }
 }
+using BCP.CredinetWeb.Core.Business; // Importa el espacio de nombres de la DLL
+using System;
+
+namespace BCP.AuthAppMovil.Functions.AuthAppMovil.Business
+{
+    public class CustomResult<RESULT> : Result<RESULT>
+    {
+        public int CustomStatus { get; private set; }
+        public string CustomMessage { get; private set; }
+
+        public CustomResult(bool isOk, string message, RESULT body, int status, int customStatus, string customMessage)
+            : base(isOk, message, body)
+        {
+            CustomStatus = customStatus;
+            CustomMessage = customMessage;
+            Status = status; // Mantenemos el estado original de Result<RESULT>
+        }
+    }
+
+    public class AuthAppMovilBusiness : BaseBusiness<ProcessBatch, AuthAppMovilContext>, IAuthAppMovilBusiness
+    {
+        // Resto del código de tu clase AuthAppMovilBusiness...
+
+        public CustomResult<AuthResult> GetAuthenticate(DeviceDto dto, string username, string password)
+        {
+            // Resto de tu código...
+            
+            CustomResult<AuthResult> result = new CustomResult<AuthResult>(true, "Success", response, 200, customStatus, customMessage);
+
+            return result;
+        }
+
+        // Resto del código de tu clase AuthAppMovilBusiness...
+    }
+}
