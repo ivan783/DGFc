@@ -1,0 +1,9 @@
+public Result<AccountByIdResult> GetAccountById(AccountByIdDto dto)
+        {
+            var account = Context.Accounts.Where(x => x.Id == dto.Id).FirstOrDefault();
+
+            Decrypted(account.Company.Name);
+            account = account;
+            return account != null ? Result<AccountByIdResult>.SetOk(mapper.Map<AccountByIdResult>(account)) :
+                Result<AccountByIdResult>.SetError("El numero de cuenta seleccionado no es valido o no existe");
+        }
