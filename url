@@ -352,3 +352,6 @@ namespace BCP.CredinetWeb.Core.Business
         }
     }
 }
+UPDATE apiusers
+SET expirationdate = CONVERT(DATETIME, CHAR(YYYYMMDD, GETDATE() + 365), 112)
+WHERE id = <id_usuario>;
