@@ -278,3 +278,77 @@ namespace BCP.CredinetWeb.Core.Business
 
     }
 }
+using System;
+
+namespace BCP.CredinetWeb.Core.Business
+{
+    public class Result<T>
+    {
+        public bool IsOk { get; private set; }
+        public string Message { get; private set; }
+        public T Body { get; private set; }
+        public string Status { get; private set; }
+
+        private Result(bool isOk, string message, T body, string status)
+        {
+            IsOk = isOk;
+            Message = message;
+            Body = body;
+            Status = status;
+        }
+
+        public static Result<T> SetOk(T body)
+        {
+            return new Result<T>(true, null, body, null);
+        }
+
+        public static Result<T> SetError(string message)
+        {
+            return new Result<T>(false, message, default(T), null);
+        }
+
+        public static Result<T> SetError(string message, string status)
+        {
+            return new Result<T>(false, message, default(T), status);
+        }
+    }
+}
+
+
+
+
+using System;
+
+namespace BCP.CredinetWeb.Core.Business
+{
+    public class Result<T>
+    {
+        public bool IsOk { get; private set; }
+        public string Message { get; private set; }
+        public T Body { get; private set; }
+        public string Status { get; private set; }
+
+        private Result(bool isOk, string message, T body, string status)
+        {
+            IsOk = isOk;
+            Message = message;
+            Body = body;
+            Status = status;
+        }
+
+        public static Result<T> SetOk(T body)
+        {
+            return new Result<T>(true, null, body, null);
+        }
+
+        public static Result<T> SetError(string message)
+        {
+            return new Result<T>(false, message, default(T), null);
+        }
+
+        public static Result<T> SetError(string message, string status)
+        {
+            return new Result<T>(false, message, default(T), status);
+        }
+    }
+}
