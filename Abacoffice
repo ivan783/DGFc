@@ -7,3 +7,18 @@ public Result<AccountByIdResult> GetAccountById(AccountByIdDto dto)
             return account != null ? Result<AccountByIdResult>.SetOk(mapper.Map<AccountByIdResult>(account)) :
                 Result<AccountByIdResult>.SetError("El numero de cuenta seleccionado no es valido o no existe");
         }
+public Result<AccountByIdResult> GetAccountById(AccountByIdDto dto) 
+{
+    var account = Context.Accounts
+        .Include(x => x.Company)
+        .FirstOrDefault(x => x.Id == dto.Id);
+
+    if (account != null) 
+    {
+        Decrypted(account.Company.Name);
+        var accountResult = mapper.Map<AccountByIdResult>(account);
+        return Result<AccountByIdResult>.SetOk(accountResult);
+    }
+    
+    return Result<AccountByIdResult>.SetError("El número de cuenta seleccionado no es válido o no existe");
+}
