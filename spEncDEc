@@ -200,3 +200,34 @@ SELECT @OutputText AS DecryptedText;
 
 Msg 257, Level 16, State 3, Procedure SpDecryptedTextNew, Line 0 [Batch Start Line 0]
 Implicit conversion from data type varchar to varbinary is not allowed. Use the CONVERT function to run this query.
+
+
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpDecryptedTextNew] Script Date: 6/6/2023 12:00:00 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpDecryptedTextNew]
+(
+    @EncryptedText VARCHAR(MAX),
+    @DecryptedText NVARCHAR(MAX) OUTPUT
+)
+AS
+BEGIN
+    ---------Desencriptación----------
+    DECLARE @EncryptedData VARBINARY(MAX) = CONVERT(VARBINARY(MAX), @EncryptedText, 1);
+    
+    OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+    
+    IF (@EncryptedData IS NOT NULL)
+    BEGIN
+        SET @DecryptedText = CONVERT(NVARCHAR(MAX), DECRYPTBYKEY(@EncryptedData), 1)
+    END
+    
+    CLOSE SYMMETRIC KEY skBCP_DEV;
+END
