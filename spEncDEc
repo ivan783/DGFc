@@ -289,3 +289,5 @@ BEGIN
     
     CLOSE SYMMETRIC KEY skBCP_DEV;
 END
+Msg 402, Level 16, State 1, Procedure SpDecryptedTextNew, Line 9 [Batch Start Line 0]
+The data types varbinary and nvarchar(max) are incompatible in the add operator.
