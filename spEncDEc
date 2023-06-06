@@ -291,3 +291,32 @@ BEGIN
 END
 Msg 402, Level 16, State 1, Procedure SpDecryptedTextNew, Line 9 [Batch Start Line 0]
 The data types varbinary and nvarchar(max) are incompatible in the add operator.
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpDecryptedTextNew] Script Date: 6/6/2023 12:00:00 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpDecryptedTextNew]
+(
+    @EncryptedText NVARCHAR(MAX),
+    @DecryptedText NVARCHAR(MAX) OUTPUT
+)
+AS
+BEGIN
+    ---------Desencriptación----------
+    DECLARE @EncryptedData VARBINARY(MAX) = CONVERT(VARBINARY(MAX), @EncryptedText, 1);
+    
+    OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+    
+    IF (@EncryptedData IS NOT NULL)
+    BEGIN
+        SET @DecryptedText = CAST(DECRYPTBYKEY(@EncryptedData) AS NVARCHAR(MAX));
+    END
+    
+    CLOSE SYMMETRIC KEY skBCP_DEV;
+END
