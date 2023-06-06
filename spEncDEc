@@ -56,4 +56,106 @@ BEGIN
 SELECT @TextDto;
 GO
 
+CREATE PROCEDURE [cw].[SpEncryptedText]
+(
+    @Text NVARCHAR(4000),
+    @EncryptedText NVARCHAR(4000) OUTPUT
+)
+AS
+BEGIN
+    ---------Encriptacion----------
+    OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+    
+    IF (@Text IS NOT NULL AND @Text <> '')
+    BEGIN
+        SET @EncryptedText = CONVERT(nvarchar(4000), ENCRYPTBYKEY(Key_GUID('skBCP_DEV'), @Text), 1)
+    END
 
+    CLOSE SYMMETRIC KEY skBCP_DEV;
+END
+
+
+CREATE PROCEDURE [cw].[SpEncryptedText]
+(
+    @Text NVARCHAR(4000),
+    @EncryptedText NVARCHAR(4000) OUTPUT
+)
+AS
+BEGIN
+    BEGIN TRANSACTION;
+    
+    BEGIN TRY
+        ---------Encriptacion----------
+        OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+        
+        IF (@Text IS NOT NULL AND @Text <> '')
+        BEGIN
+            SET @EncryptedText = CONVERT(nvarchar(4000), ENCRYPTBYKEY(Key_GUID('skBCP_DEV'), @Text), 1)
+        END
+        
+        CLOSE SYMMETRIC KEY skBCP_DEV;
+        
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Manejar el error según sea necesario
+    END CATCH
+END
+
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpDecryptedText] Script Date: 6/6/2023 12:00:00 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpDecryptedText]
+(
+    @EncryptedText NVARCHAR(4000),
+    @DecryptedText NVARCHAR(4000) OUTPUT
+)
+AS
+BEGIN
+    ---------Desencriptación----------
+    OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+    
+    IF (@EncryptedText IS NOT NULL AND @EncryptedText <> '')
+    BEGIN
+        SET @DecryptedText = CONVERT(nvarchar(4000), DECRYPTBYKEY(@EncryptedText), 1)
+    END
+    
+    CLOSE SYMMETRIC KEY skBCP_DEV;
+END
+
+
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpDecryptedText] Script Date: 6/6/2023 12:00:00 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpDecryptedText]
+(
+    @EncryptedText VARBINARY(4000),
+    @DecryptedText NVARCHAR(4000) OUTPUT
+)
+AS
+BEGIN
+    ---------Desencriptación----------
+    OPEN SYMMETRIC KEY skBCP_DEV DECRYPTION BY CERTIFICATE CertBCP_DEV;
+    
+    IF (@EncryptedText IS NOT NULL)
+    BEGIN
+        SET @DecryptedText = CONVERT(nvarchar(4000), DECRYPTBYKEY(@EncryptedText), 1)
+    END
+    
+    CLOSE SYMMETRIC KEY skBCP_DEV;
+END
