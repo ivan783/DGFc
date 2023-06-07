@@ -365,3 +365,15 @@ public Result<List<FavoriteTransactionsResult>> Get()
     // Se llama al método favorite.Get() pasando el objeto dto como argumento.
     return favorite.Get(dto);
 }
+public Result<List<FavoriteTransactionsResult>> Get()
+{
+    List<FavoriteTransactionsResult> results = new List<FavoriteTransactionsResult>();
+
+    // Se agrega el primer valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA }));
+
+    // Se agrega el segundo valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA_LIP }));
+
+    return new Result<List<FavoriteTransactionsResult>>(results);
+}
