@@ -377,3 +377,39 @@ public Result<List<FavoriteTransactionsResult>> Get()
 
     return new Result<List<FavoriteTransactionsResult>>(results);
 }
+public Result<List<FavoriteTransactionsResult>> Get()
+{
+    List<FavoriteTransactionsResult> results = new List<FavoriteTransactionsResult>();
+
+    // Se agrega el primer valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA }).ToList());
+
+    // Se agrega el segundo valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA_LIP }).ToList());
+
+    return new Result<List<FavoriteTransactionsResult>>(results);
+}
+public Result<List<FavoriteTransactionsResult>> Get()
+{
+    List<FavoriteTransactionsResult> results = new List<FavoriteTransactionsResult>();
+
+    // Se agrega el primer valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA }).ToList());
+
+    // Se agrega el segundo valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA_LIP }).ToList());
+
+    return new Result<List<FavoriteTransactionsResult>>(results);
+}
+public Result<List<FavoriteTransactionsResult>> Get()
+{
+    List<FavoriteTransactionsResult> results = new List<FavoriteTransactionsResult>();
+
+    // Se agrega el primer valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA }).ToList());
+
+    // Se agrega el segundo valor de enumeración a la lista de resultados
+    results.AddRange(favorite.Get(new FavoriteTransactionDto { OperationTypeId = BaseConstants.OPERATION_PAGO_PROVEEDORES_CHEQUE_GERENCIA_LIP }).ToList());
+
+    return new Result<List<FavoriteTransactionsResult>>(results);
+}
