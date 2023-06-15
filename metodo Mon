@@ -155,3 +155,72 @@ private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest bas
             };
             return currentRequest;
         }
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, string cuentaDestino, string nombreClienteDestino, string emailCuentaDestino, string bancoDestino)
+{
+    var currentRequest = new GetDBFDMonitorRequest
+    {
+        IpSolicitud = baseRequest.IpSolicitud,
+        IdcCliente = baseRequest.IdcCliente,
+        UsuarioCliente = baseRequest.UsuarioCliente,
+        Cic = baseRequest.Cic,
+        TipoPersona = baseRequest.TipoPersona,
+        DatosReto = "",
+        PreguntasReto = "S",
+        RespuestasCorrectas = "S",
+        OrigenTransaccion = "WEB-JS",
+        CodigoRespuestaHost = "00",
+        LocalInternacional = "L",
+        TipoCuentaVip = "0",
+        NroTransferenciaOriginal = "",
+        CicDestino = "",
+        TelefonoCuentaDestino = "",
+        TipoProductoDestino = "",
+        EstadoCuenta = "0",
+        TipoPagoServicio = "",
+        ServicioEmpresa = "",
+        CodigoCliente = "",
+        IndicadorRealTime = "S",
+        JsonFingerPrint = "",
+        NumeroCuentaProducto = baseRequest.NumeroCuentaProducto,
+        EjecutivoCuentaOrigen = this.UserId.ToString(),
+        CodigoTransaccion = baseRequest.CodigoTransaccion,
+        CodigoProducto = resRepex.Application.Trim(),
+        CodigoSubProducto = " ",
+        Reverso = "N",
+        DebitoCredito = baseRequest.DebitoCredito,
+        TelefonoCelular = baseRequest.TelefonoCelular,
+        CorreoElectronicoEmail = baseRequest.CorreoElectronicoEmail,
+        FechaHoraTransaccion = DateTime.Now.ToString("yyyyMMddHHmmss"),
+        UsuarioAutorizador = this.UserId.ToString(),
+        FechaAperturaCuenta = resAccounts,
+        MonedaTransaccion = processBatch,
+        TipoCambio = typeMon,
+        NombreClienteOrigen = resRepex.Client,
+        CuentaDestino = cuentaDestino,
+        NombreClienteDestino = nombreClienteDestino,
+        EmailCuentaDestino = emailCuentaDestino.Length > 40 ? emailCuentaDestino.Trim().Substring(0, Math.Min(40, emailCuentaDestino.Trim().Length)) : emailCuentaDestino,
+        BancoDestino = bancoDestino,
+        NumeroTransaccionTrace = GetTrace(),
+        SessionId = userName.Trim().Substring(10, Math.Min(6, userName.Trim().Length)) + DateTime.Now.ToString("yyyyMMddHHmmss"),
+    };
+
+    return currentRequest;
+}
+
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, PaymentAchSpreadsheetsResult j)
+{
+    return CreateDBFDMonitorRequest(baseRequest, resRepex, userName, resAccounts, processBatch, typeMon, j.TargetAccount, j.Beneficiary
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, PaymentAchSpreadsheetsResult j)
+{
+    return CreateDBFDMonitorRequest(baseRequest, resRepex, userName, resAccounts, processBatch, typeMon, j.TargetAccount, j.Beneficiary, j.Mail, j.BanksAchCode);
+}
+
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, MultiplePaymentsSpreadsheetsResult j)
+{
+    return CreateDBFDMonitorRequest(baseRequest, resRepex, userName, resAccounts, processBatch, typeMon, j.AccountNumber, j.TitularName, j.Mail, j.BankId);
+}
+
+private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, FavoritePaymentsSpreadsheetsResult j)
+{
+    return CreateDBFDMonitorRequest(baseRequest, resRepex, userName, resAccounts, processBatch, typeMon, j.AccountNumber, j.TitularName, j.Mail, j.BankId);
+}
