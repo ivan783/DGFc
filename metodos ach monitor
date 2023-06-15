@@ -95,3 +95,17 @@ public async Task<Result<List<MultiplePaymentsSpreadsheetsResult>>> DBFDMonitorR
     decimal typeMon = 0;
     // Resto del código específico para DBFDMonitorRespMultipleAch
 }
+private async Task<GetAccountClientResponse> ConsultarRepexAsync(string accountNumber)
+{
+    GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+    requestRepex.AccountNumber = accountNumber;
+    requestRepex.DocumentNumber = "--";
+    requestRepex.DocumentExtension = "--";
+    logger.LogError($"Request consulta repex: {accountNumber}");
+    var resRepex = await repExtManager.GetAccountClientAsync(requestRepex);
+
+    var json = JsonConvert.SerializeObject(resRepex);
+    logger.LogError($"Response consulta repex: {json}");
+
+    return resRepex;
+}
