@@ -43,3 +43,55 @@ public async Task<Result<List<PaymentAchSpreadsheetsResult>>> DBFDMonitorRespAch
             var typeOpe = "";
             decimal typeMon = 0;
             }
+private async Task<GetAccountClientResponse> ConsultarRepex(string accountNumber)
+{
+    GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+    requestRepex.AccountNumber = accountNumber;
+    requestRepex.DocumentNumber = "--";
+    requestRepex.DocumentExtension = "--";
+    logger.LogError($"Request consulta repex: {accountNumber}");
+    var resRepex = repExtManager.GetAccountClient(requestRepex);
+
+    var json = JsonConvert.SerializeObject(resRepex);
+    logger.LogError($"Response consulta repex: {json}");
+
+    return resRepex;
+}
+
+public async Task<Result<List<PaymentAchSpreadsheetsResult>>> DBFDMonitorRespAch(PaymentAchDto dto)
+{
+    var userName = UserInfo.Identity.GetUserName();
+    logger.LogError($"-----Iniciando el Monitoreo ACH: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+
+    var resRepex = await ConsultarRepex(dto.SourceAccount);
+
+    var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+    var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+    var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+
+    SetExchangeRates();
+
+    var reult = new ConcurrentBag<GetDBFDMonitorResponse>();
+    var typeOpe = "";
+    decimal typeMon = 0;
+    // Resto del código específico para DBFDMonitorRespAch
+}
+
+public async Task<Result<List<MultiplePaymentsSpreadsheetsResult>>> DBFDMonitorRespMultipleAch(MultiplePaymentsDto dto)
+{
+    var userName = UserInfo.Identity.GetUserName();
+    logger.LogError($"-----Iniciando el Monitoreo ACH: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+
+    var resRepex = await ConsultarRepex(dto.SourceAccount);
+
+    var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+    var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+    var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+
+    SetExchangeRates();
+
+    var reult = new ConcurrentBag<GetDBFDMonitorResponse>();
+    var typeOpe = "";
+    decimal typeMon = 0;
+    // Resto del código específico para DBFDMonitorRespMultipleAch
+}
