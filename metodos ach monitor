@@ -1,0 +1,45 @@
+public async Task<Result<List<PaymentAchSpreadsheetsResult>>> DBFDMonitorRespAch(PaymentAchDto dto)
+        {
+            var userName = UserInfo.Identity.GetUserName();
+            logger.LogError($"-----Iniciando el Monitoreo ACH: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+            GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+            List<PaymentAchSpreadsheetsResult> superviceResp = new List<PaymentAchSpreadsheetsResult>();
+            requestRepex.AccountNumber = dto.SourceAccount;
+            requestRepex.DocumentNumber = "--";
+            requestRepex.DocumentExtension = "--";
+            logger.LogError($"Request consulta repex: {dto.SourceAccount}");
+            var resRepex = repExtManager.GetAccountClient(requestRepex);
+
+            var json = JsonConvert.SerializeObject(resRepex);
+            logger.LogError($"Response consulta repex: {json}");
+            var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+            var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+            var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+            SetExchangeRates();
+            var reult = new ConcurrentBag<GetDBFDMonitorResponse>(); ;
+            var typeOpe = "";
+            decimal typeMon = 0;
+            }
+            
+            public async Task<Result<List<MultiplePaymentsSpreadsheetsResult>>> DBFDMonitorRespMultipleAch(MultiplePaymentsDto dto)
+        {
+            var userName = UserInfo.Identity.GetUserName();
+            logger.LogError($"-----Iniciando el Monitoreo ACH: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+            GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+            List<PaymentAchSpreadsheetsResult> superviceResp = new List<PaymentAchSpreadsheetsResult>();
+            requestRepex.AccountNumber = dto.SourceAccount;
+            requestRepex.DocumentNumber = "--";
+            requestRepex.DocumentExtension = "--";
+            logger.LogError($"Request consulta repex: {dto.SourceAccount}");
+            var resRepex = repExtManager.GetAccountClient(requestRepex);
+
+            var json = JsonConvert.SerializeObject(resRepex);
+            logger.LogError($"Response consulta repex: {json}");
+            var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+            var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+            var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+            SetExchangeRates();
+            var reult = new ConcurrentBag<GetDBFDMonitorResponse>(); ;
+            var typeOpe = "";
+            decimal typeMon = 0;
+            }
