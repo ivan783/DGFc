@@ -109,3 +109,20 @@ private async Task<GetAccountClientResponse> ConsultarRepexAsync(string accountN
 
     return resRepex;
 }
+private async Task<GetAccountClientResponse> ConsultarRepexAsync(string accountNumber)
+{
+    return await Task.Run(() =>
+    {
+        GetAccountClientRequest requestRepex = new GetAccountClientRequest();
+        requestRepex.AccountNumber = accountNumber;
+        requestRepex.DocumentNumber = "--";
+        requestRepex.DocumentExtension = "--";
+        logger.LogError($"Request consulta repex: {accountNumber}");
+        var resRepex = repExtManager.GetAccountClient(requestRepex);
+
+        var json = JsonConvert.SerializeObject(resRepex);
+        logger.LogError($"Response consulta repex: {json}");
+
+        return resRepex;
+    });
+}
