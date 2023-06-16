@@ -1,0 +1,389 @@
+public async Task<Result<List<PaymentAchSpreadsheetsResult>>> DBFDMonitorRespAch(PaymentAchDto dto)
+        {
+            var userName = UserInfo.Identity.GetUserName();
+            logger.LogError($"-----Iniciando el Monitoreo ACH: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+            List<PaymentAchSpreadsheetsResult> superviceResp = new List<PaymentAchSpreadsheetsResult>();
+            var resRepex = await RepexAsync(dto.SourceAccount);
+            var json = JsonConvert.SerializeObject(resRepex);
+            logger.LogError($"Response consulta repex: {json}");
+            var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+            var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+            var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+            SetExchangeRates();
+            var reult = new ConcurrentBag<GetDBFDMonitorResponse>(); ;
+            var typeOpe = "";
+            decimal typeMon = 0;
+            var _ip = "";
+            if (dto.OperationTypeId == 24 /*|| processBatch.TransferType.Type == 2*/)
+            {
+                typeOpe = "203";
+            }
+            if (resAccounts.Currency.Trim() != /*processBatch.Currency.Trim() ||*/ dto.Currency)
+            {
+                if (resAccounts.Currency.Trim() == "USD" && /*processBatch.Currency.Trim()*/dto.Currency == "BOL")
+                {
+                    typeMon = lastExchangeRates.Sale;
+                }
+                else if (resAccounts.Currency.Trim() == "BOL" && /*processBatch.Currency.Trim()*/dto.Currency == "USD")
+                {
+                    typeMon = lastExchangeRates.Purchase;
+                }
+            }
+            else
+            {
+                typeMon = 0;
+            }
+            if (string.IsNullOrEmpty(dto.Ip) || dto.Ip.Length >= 16 || dto.Ip == "NOT_IP")
+            {
+                _ip = "172.31.4.227";
+                logger.LogError($"Deificultad al encontrar la direccion Ip: ----{dto?.Ip}---- se aigna la Ip: 172.31.4.227 ");
+            }
+            else
+            {
+                _ip = dto?.Ip;
+                logger.LogError($"Encontro la Ip de forma Correcta: ---{dto?.Ip}----");
+            }
+
+            var ach = dto.Type;
+            var request = new GetDBFDMonitorRequest
+            {
+                IdcCliente = resRepex.DocumentNumber.Trim() + resRepex.DocumentType.Trim() + resRepex.DocumentExtension.Trim(),
+                UsuarioCliente = userName,
+                Cic = resRepex.CIC.Trim(),
+                TipoPersona = resJurNat?.TypeIdc?.Trim() == "T" ? "J" : "N",
+                NumeroCuentaProducto = resAccounts.FormattedAccount.Replace("-", ""),
+                EjecutivoCuentaOrigen = this.UserId.ToString(),
+                CodigoTransaccion = typeOpe,
+                CodigoProducto = resRepex.Application.Trim(),
+                CodigoSubProducto = " ",
+                Reverso = "N",
+                DebitoCredito = resAccounts.AccountUse.Trim(),
+                TelefonoCelular = DecryptString(resUserName.PhoneNumber.Trim()),
+                CorreoElectronicoEmail = DecryptString(resUserName.Email.Trim()),
+                IpSolicitud = _ip,
+            };
+            bool invalidResponse = false;
+            var cancelToken = new CancellationTokenSource();
+            logger.LogError($"Lista total ACHs: ----{dto.Spreadsheet.Count}-----");
+            Parallel.ForEach(dto.Spreadsheet, (j, state) =>
+            {
+                /*if (invalidResponse)
+                {
+                    state.Break();
+                    return;
+                }*/
+                var currentRequest = CreateDBFDMonitorRequestACH(request, resRepex, userName, resAccounts.DateCreation.ToString("yyyyMMdd"), /*processBatch.Currency.Trim()*/dto.Currency, typeMon, j);
+
+                var response = this.manager.GetDBFDMonitor(currentRequest);
+                reult.Add(response);
+
+                var aux = JsonConvert.SerializeObject(currentRequest);
+                response = this.manager.GetDBFDMonitor(currentRequest);
+                var aux1 = JsonConvert.SerializeObject(response?.AnswerCode);
+                var aux2 = JsonConvert.SerializeObject(response?.AnswerMessage);
+                var aux3 = JsonConvert.SerializeObject(response?.MonitorResponse?.Message);
+                //reult = Result<GetDBFDMonitorResponse>.SetOk(response);
+
+                if (response.AnswerCode != "00")
+                {
+                    logger.LogError($"Request: ----{aux}-----");
+                    var operationStatusError = 8;
+                    j.ProcessMessage = response.AnswerMessage;
+                    j.OperationStatusId = 14;
+                   // processBatch.OperationStatusId = operationStatusError;
+                    //processBatch.TextMessages=""
+                    logger.LogError($"Response: ----{aux1}--__--{aux2}----");
+                    logger.LogError($"ResponseDetalle Mensaje: ----{aux3}-----");
+                    logger.LogError($"------Tempo de observación: {DateTime.Now.ToString("yyyyMMddHHmmss")}--- Para: {userName}-----");
+                    //state.Break();
+                }
+                else
+                {
+
+                }
+            });
+            superviceResp = dto.Spreadsheet;
+            return Result<List<PaymentAchSpreadsheetsResult>>.SetOk(superviceResp);
+            //throw new System.NotImplementedException();
+        }
+        /*
+        private GetDBFDMonitorRequest CreateDBFDMonitorRequest(GetDBFDMonitorRequest baseRequest, GetAccountClientResponse resRepex, string userName, string resAccounts, string processBatch, decimal typeMon, PaymentAchSpreadsheetsResult j)
+        {
+            var currentRequest = new GetDBFDMonitorRequest
+            {
+                IpSolicitud = baseRequest.IpSolicitud,
+
+                IdcCliente = baseRequest.IdcCliente,
+                UsuarioCliente = baseRequest.UsuarioCliente,
+                Cic = baseRequest.Cic,
+                TipoPersona = baseRequest.TipoPersona,
+                DatosReto = "",
+                PreguntasReto = "S",
+                RespuestasCorrectas = "S",
+                OrigenTransaccion = "WEB-JS",
+                CodigoRespuestaHost = "00",
+                LocalInternacional = "L",
+                TipoCuentaVip = "0",
+                NroTransferenciaOriginal = "",
+                CicDestino = "",
+                TelefonoCuentaDestino = "",
+                TipoProductoDestino = "",
+                EstadoCuenta = "0",
+                TipoPagoServicio = "",
+                ServicioEmpresa = "",
+                CodigoCliente = "",
+                IndicadorRealTime = "S",
+                JsonFingerPrint = "",
+                NumeroCuentaProducto = baseRequest.NumeroCuentaProducto,
+                EjecutivoCuentaOrigen = this.UserId.ToString(),
+                CodigoTransaccion = baseRequest.CodigoTransaccion,
+                CodigoProducto = resRepex.Application.Trim(),
+                CodigoSubProducto = " ",
+                Reverso = "N",
+                DebitoCredito = baseRequest.DebitoCredito,
+                TelefonoCelular = baseRequest.TelefonoCelular,
+                CorreoElectronicoEmail = baseRequest.CorreoElectronicoEmail,
+                FechaHoraTransaccion = DateTime.Now.ToString("yyyyMMddHHmmss"),
+                UsuarioAutorizador = this.UserId.ToString(),
+                FechaAperturaCuenta = resAccounts,
+                MonedaTransaccion = processBatch,
+                ImporteTransaccion = j.Amount,
+                TipoCambio = typeMon,
+                NombreClienteOrigen = resRepex.Client,
+                CuentaDestino = j.TargetAccount,
+                NombreClienteDestino = j.Beneficiary,
+                EmailCuentaDestino = j.Mail.Length > 40 ? j.Mail.Trim().Substring(0, Math.Min(40, j.Mail.Trim().Length)) : j.Mail,
+                BancoDestino = j.BanksAchCode,
+                NumeroTransaccionTrace = GetTrace(),
+                SessionId = userName.Trim().Substring(10, Math.Min(6, userName.Trim().Length)) + DateTime.Now.ToString("yyyyMMddHHmmss"),
+            };
+            return currentRequest;
+        }*/
+        private void SetExchangeRates()
+        {
+            logger.LogError("Configurando tipos de cambio");
+            lastExchangeRates = Context.ExchangeRates.OrderByDescending(x => x.Date).First();
+            logger.LogError($"Compra: {lastExchangeRates.Purchase}. Venta: {lastExchangeRates.Sale}");
+        }
+        private string GetTrace()
+        {
+            Thread.Sleep(1000);
+            Trace = $"{UserInfo.Identity.GetUserId<int>()}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            return Trace;
+        }
+        private string DecryptString(string dto)
+        {
+            if (!string.IsNullOrEmpty(dto) && dto.Contains("0x00"))
+            {
+                var respEncripted = Context.ExecuteScalar<string>("cw.SpDecryptedText @TextDto", 400,
+                                                       new SqlParameter("TextDto", dto.Trim()));
+                return respEncripted;
+            }
+            return dto;
+        }
+
+        public async Task<Result<List<MultiplePaymentsSpreadsheetsResult>>> DBFDMonitorRespMultipleAch(MultiplePaymentsDto dto)
+        {
+            var userName = UserInfo.Identity.GetUserName();
+            logger.LogError($"-----Iniciando el Monitoreo Multiple: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+            List<MultiplePaymentsSpreadsheetsResult> superviceResp = new List<MultiplePaymentsSpreadsheetsResult>();
+            var resRepex = await RepexAsync(dto.SourceAccount);
+            var json = JsonConvert.SerializeObject(resRepex);
+            logger.LogError($"Response consulta repex: {json}");
+            var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+            var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+            var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+            SetExchangeRates();
+            var reult = new ConcurrentBag<GetDBFDMonitorResponse>(); ;
+            var typeOpe = "";
+            decimal typeMon = 0;
+            var _ip = "";
+            if (dto.OperationTypeId == 20 /*|| processBatch.TransferType.Type == 2*/)
+            {
+                typeOpe = "203";
+            }
+            if (resAccounts.Currency.Trim() != /*processBatch.Currency.Trim() ||*/ dto.Currency)
+            {
+                if (resAccounts.Currency.Trim() == "USD" && /*processBatch.Currency.Trim()*/dto.Currency == "BOL")
+                {
+                    typeMon = lastExchangeRates.Sale;
+                }
+                else if (resAccounts.Currency.Trim() == "BOL" && /*processBatch.Currency.Trim()*/dto.Currency == "USD")
+                {
+                    typeMon = lastExchangeRates.Purchase;
+                }
+            }
+            else
+            {
+                typeMon = 0;
+            }
+            if (string.IsNullOrEmpty(dto.Ip) || dto.Ip.Length >= 16 || dto.Ip == "NOT_IP")
+            {
+                _ip = "172.31.4.227";
+                logger.LogError($"Deificultad al encontrar la direccion Ip: ----{dto?.Ip}---- se aigna la Ip: 172.31.4.227 ");
+            }
+            else
+            {
+                _ip = dto?.Ip;
+                logger.LogError($"Encontro la Ip de forma Correcta: ---{dto?.Ip}----");
+            }
+
+            var ach = dto.Spreadsheet.GetType();
+            var request = new GetDBFDMonitorRequest
+            {
+                IdcCliente = resRepex.DocumentNumber.Trim() + resRepex.DocumentType.Trim() + resRepex.DocumentExtension.Trim(),
+                UsuarioCliente = userName,
+                Cic = resRepex.CIC.Trim(),
+                TipoPersona = resJurNat?.TypeIdc?.Trim() == "T" ? "J" : "N",
+                NumeroCuentaProducto = resAccounts.FormattedAccount.Replace("-", ""),
+                EjecutivoCuentaOrigen = this.UserId.ToString(),
+                CodigoTransaccion = typeOpe,
+                CodigoProducto = resRepex.Application.Trim(),
+                CodigoSubProducto = " ",
+                Reverso = "N",
+                DebitoCredito = resAccounts.AccountUse.Trim(),
+                TelefonoCelular = DecryptString(resUserName.PhoneNumber.Trim()),
+                CorreoElectronicoEmail = DecryptString(resUserName.Email.Trim()),
+                IpSolicitud = _ip,
+            };
+           // bool invalidResponse = false;
+            var cancelToken = new CancellationTokenSource();
+            logger.LogError($"Lista total ACHs: ----{dto.Spreadsheet.FormAchPayments.Count}-----");
+            Parallel.ForEach(dto.Spreadsheet.FormAchPayments, (j, state) =>
+            {
+                var currentRequest = CreateDBFDMonitorRequestMultiple(request, resRepex, userName, resAccounts.DateCreation.ToString("yyyyMMdd"), /*processBatch.Currency.Trim()*/dto.Currency, typeMon, j);
+
+                var response = this.manager.GetDBFDMonitor(currentRequest);
+                reult.Add(response);
+
+                var aux = JsonConvert.SerializeObject(currentRequest);
+                response = this.manager.GetDBFDMonitor(currentRequest);
+                var aux1 = JsonConvert.SerializeObject(response?.AnswerCode);
+                var aux2 = JsonConvert.SerializeObject(response?.AnswerMessage);
+                var aux3 = JsonConvert.SerializeObject(response?.MonitorResponse?.Message);
+                //reult = Result<GetDBFDMonitorResponse>.SetOk(response);
+
+                if (response.AnswerCode != "00")
+                {
+                    logger.LogError($"Request: ----{aux}-----");
+                    var operationStatusError = 8;
+                   // j.ProcessMessage = response.AnswerMessage;
+                    //j.OperationStatusId = 14;
+                    // processBatch.OperationStatusId = operationStatusError;
+                    //processBatch.TextMessages=""
+                    logger.LogError($"Response: ----{aux1}--__--{aux2}----");
+                    logger.LogError($"ResponseDetalle Mensaje: ----{aux3}-----");
+                    logger.LogError($"------Tempo de observación: {DateTime.Now.ToString("yyyyMMddHHmmss")}--- Para: {userName}-----");
+                    //state.Break();
+                }
+                else
+                {
+
+                }
+            });
+            superviceResp = dto.Spreadsheet.FormAchPayments;
+            return Result<List<MultiplePaymentsSpreadsheetsResult>>.SetOk(superviceResp);
+        }
+
+        public async Task<Result<List<FavoritePaymentsSpreadsheetsResult>>> DBFDMonitorRespFavoriteAch(FavoritePaymentsDto dto)
+        {
+            var userName = UserInfo.Identity.GetUserName();
+            logger.LogError($"-----Iniciando el Monitoreo Multiple: {DateTime.Now.ToString("yyyyMMddHHmmss")}------ Para: {userName}---------");
+            List<FavoritePaymentsSpreadsheetsResult> superviceResp = new List<FavoritePaymentsSpreadsheetsResult>();
+            var resRepex = await RepexAsync(dto.SourceAccount);
+            var json = JsonConvert.SerializeObject(resRepex);
+            logger.LogError($"Response consulta repex: {json}");
+            var resUserName = Context.Users.Where(x => x.Id == this.UserId).FirstOrDefault();
+            var resAccounts = Context.Accounts.Where(x => x.Number.Trim() == dto.SourceAccount.Trim()).FirstOrDefault();
+            var resJurNat = Context.Companies.Where(x => x.Id == this.companyId).FirstOrDefault();
+            SetExchangeRates();
+            var reult = new ConcurrentBag<GetDBFDMonitorResponse>(); ;
+            var typeOpe = "";
+            decimal typeMon = 0;
+            var _ip = "";
+            if (dto.OperationTypeId == 20 /*|| processBatch.TransferType.Type == 2*/)
+            {
+                typeOpe = "203";
+            }
+            if (resAccounts.Currency.Trim() != /*processBatch.Currency.Trim() ||*/ dto.Currency)
+            {
+                if (resAccounts.Currency.Trim() == "USD" && /*processBatch.Currency.Trim()*/dto.Currency == "BOL")
+                {
+                    typeMon = lastExchangeRates.Sale;
+                }
+                else if (resAccounts.Currency.Trim() == "BOL" && /*processBatch.Currency.Trim()*/dto.Currency == "USD")
+                {
+                    typeMon = lastExchangeRates.Purchase;
+                }
+            }
+            else
+            {
+                typeMon = 0;
+            }
+            if (string.IsNullOrEmpty(dto.Ip) || dto.Ip.Length >= 16 || dto.Ip == "NOT_IP")
+            {
+                _ip = "172.31.4.227";
+                logger.LogError($"Deificultad al encontrar la direccion Ip: ----{dto?.Ip}---- se aigna la Ip: 172.31.4.227 ");
+            }
+            else
+            {
+                _ip = dto?.Ip;
+                logger.LogError($"Encontro la Ip de forma Correcta: ---{dto?.Ip}----");
+            }
+
+            var ach = dto.Spreadsheet.GetType();
+            var request = new GetDBFDMonitorRequest
+            {
+                IdcCliente = resRepex.DocumentNumber.Trim() + resRepex.DocumentType.Trim() + resRepex.DocumentExtension.Trim(),
+                UsuarioCliente = userName,
+                Cic = resRepex.CIC.Trim(),
+                TipoPersona = resJurNat?.TypeIdc?.Trim() == "T" ? "J" : "N",
+                NumeroCuentaProducto = resAccounts.FormattedAccount.Replace("-", ""),
+                EjecutivoCuentaOrigen = this.UserId.ToString(),
+                CodigoTransaccion = typeOpe,
+                CodigoProducto = resRepex.Application.Trim(),
+                CodigoSubProducto = " ",
+                Reverso = "N",
+                DebitoCredito = resAccounts.AccountUse.Trim(),
+                TelefonoCelular = DecryptString(resUserName.PhoneNumber.Trim()),
+                CorreoElectronicoEmail = DecryptString(resUserName.Email.Trim()),
+                IpSolicitud = _ip,
+            };
+            // bool invalidResponse = false;
+            var cancelToken = new CancellationTokenSource();
+            logger.LogError($"Lista total ACHs: ----{dto.Spreadsheet.FormAchPayments.Count}-----");
+            Parallel.ForEach(dto.Spreadsheet.FormAchPayments, (j, state) =>
+            {
+                var currentRequest = CreateDBFDMonitorRequestFavorite(request, resRepex, userName, resAccounts.DateCreation.ToString("yyyyMMdd"), /*processBatch.Currency.Trim()*/dto.Currency, typeMon, j);
+
+                var response = this.manager.GetDBFDMonitor(currentRequest);
+                reult.Add(response);
+
+                var aux = JsonConvert.SerializeObject(currentRequest);
+                response = this.manager.GetDBFDMonitor(currentRequest);
+                var aux1 = JsonConvert.SerializeObject(response?.AnswerCode);
+                var aux2 = JsonConvert.SerializeObject(response?.AnswerMessage);
+                var aux3 = JsonConvert.SerializeObject(response?.MonitorResponse?.Message);
+                //reult = Result<GetDBFDMonitorResponse>.SetOk(response);
+
+                if (response.AnswerCode != "00")
+                {
+                    logger.LogError($"Request: ----{aux}-----");
+                    var operationStatusError = 8;
+                    // j.ProcessMessage = response.AnswerMessage;
+                    //j.OperationStatusId = 14;
+                    // processBatch.OperationStatusId = operationStatusError;
+                    //processBatch.TextMessages=""
+                    logger.LogError($"Response: ----{aux1}--__--{aux2}----");
+                    logger.LogError($"ResponseDetalle Mensaje: ----{aux3}-----");
+                    logger.LogError($"------Tempo de observación: {DateTime.Now.ToString("yyyyMMddHHmmss")}--- Para: {userName}-----");
+                    //state.Break();
+                }
+                else
+                {
+
+                }
+            });
+            superviceResp = dto.Spreadsheet.FormAchPayments;
+            return Result<List<FavoritePaymentsSpreadsheetsResult>>.SetOk(superviceResp);
+        }
