@@ -20,3 +20,6 @@ help-desk-manager.component.ts(10, 194): Error occurs in the template of compone
 4
 : 
 {description: 'RECHAZADO POR CLIENTE', value: 9}
+
+
+PRE_GUARD-Error de procesamiento. Object reference not set to an instance of an object.
