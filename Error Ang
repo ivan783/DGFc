@@ -23,3 +23,10 @@ help-desk-manager.component.ts(10, 194): Error occurs in the template of compone
 
 
 PRE_GUARD-Error de procesamiento. Object reference not set to an instance of an object.
+
+for(let e of this.helpDetails){
+      if(e.message.includes(this.messageValid)){debugger
+        const newConst=this.constant.batchStatusChange.filter(key=>key.value===11||key.value===9);
+        console.log(newConst);
+      }
+    }
