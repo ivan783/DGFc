@@ -1,0 +1,5 @@
+'mat-divider' is not a known element:
+1. If 'mat-divider' is an Angular component, then verify that it is part of this module.
+2. If 'mat-divider' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.ngtsc(-998001)
+help-desk-manager.component.ts(10, 194): Error occurs in the template of component HelpDeskManagerComponent.
+(element) mat-divider: HTMLElement
