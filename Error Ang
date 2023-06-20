@@ -3,3 +3,20 @@
 2. If 'mat-divider' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.ngtsc(-998001)
 help-desk-manager.component.ts(10, 194): Error occurs in the template of component HelpDeskManagerComponent.
 (element) mat-divider: HTMLElement
+
+
+0
+: 
+{description: 'PRE GUARDADO', value: 11}
+1
+: 
+{description: 'SOLICITADO', value: 1}
+2
+: 
+{description: 'PROCESADO', value: 6}
+3
+: 
+{description: 'NO PROCESADO', value: 8}
+4
+: 
+{description: 'RECHAZADO POR CLIENTE', value: 9}
