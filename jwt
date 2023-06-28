@@ -148,4 +148,93 @@ public async Task<Result<List<GetResponseCompanyApp>>> GetRespCompaniesApp()
         return Result<List<GetResponseCompanyApp>>.SetError("Error al obtener Lista");
     }
 }
+private bool IsRefreshTokenValid(string refreshToken)
+{
+    if (string.IsNullOrEmpty(refreshToken))
+    {
+        return false;
+    }
+
+    var refreshTokenExpiration = GetRefreshTokenExpiration(refreshToken);
+    var currentTime = DateTime.UtcNow;
+    var lastActivityTime = GetLastActivityTime();
+
+    if ((currentTime - lastActivityTime).TotalMinutes > 3)
+    {
+        // Si ha pasado más de 3 minutos de inactividad, el token ya no es válido
+        return false;
+    }
+
+    return refreshTokenExpiration > currentTime;
+}
+
+private DateTime GetRefreshTokenExpiration(string refreshToken)
+{
+    var handler = new JwtSecurityTokenHandler();
+    var refreshTokenToken = handler.ReadToken(refreshToken) as JwtSecurityToken;
+    var refreshTokenExpiration = refreshTokenToken.ValidTo;
+
+    return refreshTokenExpiration;
+}
+
+private DateTime GetLastActivityTime()
+{
+    var lastActivityTime = Session["LastActivityTime"] as DateTime?;
+
+    if (!lastActivityTime.HasValue)
+    {
+        lastActivityTime = DateTime.UtcNow;
+        Session["LastActivityTime"] = lastActivityTime;
+    }
+
+    return lastActivityTime.Value;
+}
+
+private void UpdateLastActivityTime()
+{
+    Session["LastActivityTime"] = DateTime.UtcNow;
+}
+
+private void RenewTokenIfOnline()
+{
+    var refreshToken = GetRefreshTokenFromSession();
+
+    if (!IsRefreshTokenValid(refreshToken))
+    {
+        RedirectToLogin();
+        return;
+    }
+
+    var currentTime = DateTime.UtcNow;
+    var lastRenewalTime = GetLastRenewalTime();
+
+    if ((currentTime - lastRenewalTime).TotalMinutes > 30)
+    {
+        var newToken = RenewToken(refreshToken);
+
+        if (!string.IsNullOrEmpty(newToken))
+        {
+            UpdateTokenInSession(newToken);
+            UpdateLastRenewalTime();
+        }
+    }
+}
+
+private DateTime GetLastRenewalTime()
+{
+    var lastRenewalTime = Session["LastRenewalTime"] as DateTime?;
+
+    if (!lastRenewalTime.HasValue)
+    {
+        lastRenewalTime = DateTime.UtcNow;
+        Session["LastRenewalTime"] = lastRenewalTime;
+    }
+
+    return lastRenewalTime.Value;
+}
+
+private void UpdateLastRenewalTime()
+{
+    Session["LastRenewalTime"] = DateTime.UtcNow;
+}
 
