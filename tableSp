@@ -12,3 +12,41 @@
     CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.OperationStatus_OperationStatusId] FOREIGN KEY ([OperationStatusId]) REFERENCES [cw].[OperationStatus] ([Id]),
     CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.ProcessBatches_ProcessBatchId] FOREIGN KEY ([ProcessBatchId]) REFERENCES [cw].[ProcessBatches] ([Id]),
     CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [cw].[Users] ([Id])
+
+
+CREATE PROCEDURE [cw].[InsertDelayAuthorizedBatch]
+(
+    @ProcessBatchId INT,
+    @UserId INT,
+    @OperationStatusId INT,
+    @Detail NVARCHAR(50),
+    @DateCreation DATETIME,
+    @DateModification DATETIME = NULL,
+    @SignerType INT,
+    @IsSend BIT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [cw].[DelayAuthorizedBatches] (ProcessBatchId, UserId, OperationStatusId, Detail, DateCreation, DateModification, SignerType, IsSend)
+    SELECT @ProcessBatchId, @UserId, @OperationStatusId, @Detail, @DateCreation, @DateModification, @SignerType, @IsSend
+    WHERE NOT EXISTS (SELECT 1 FROM [cw].[DelayAuthorizedBatches] WHERE ProcessBatchId = @ProcessBatchId);
+END
+
+
+CREATE PROCEDURE [cw].[UpdateDelayAuthorizedBatch]
+(
+    @ProcessBatchId INT,
+    @IsSend BIT,
+    @OperationStatusId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE [cw].[DelayAuthorizedBatches]
+    SET IsSend = @IsSend,
+        OperationStatusId = @OperationStatusId
+    WHERE ProcessBatchId = @ProcessBatchId;
+END
