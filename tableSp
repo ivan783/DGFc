@@ -1,0 +1,14 @@
+[cw].[DelayAuthorizedBatches] (
+    [Id]                INT           IDENTITY (1, 1) NOT NULL,
+    [ProcessBatchId]    INT           NOT NULL,
+    [UserId]            INT           NOT NULL,
+    [OperationStatusId] INT           NOT NULL,
+    [Detail]            NVARCHAR (50) NOT NULL,
+    [DateCreation]      DATETIME      NOT NULL,
+    [DateModification]  DATETIME      NULL,
+    [SignerType]        INT           NOT NULL,
+    [IsSend]            BIT           NOT NULL,
+    CONSTRAINT [PK_cw.DelayAuthorizedBatches] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.OperationStatus_OperationStatusId] FOREIGN KEY ([OperationStatusId]) REFERENCES [cw].[OperationStatus] ([Id]),
+    CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.ProcessBatches_ProcessBatchId] FOREIGN KEY ([ProcessBatchId]) REFERENCES [cw].[ProcessBatches] ([Id]),
+    CONSTRAINT [FK_cw.DelayAuthorizedBatches_cw.Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [cw].[Users] ([Id])
