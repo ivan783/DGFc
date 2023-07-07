@@ -1,4 +1,4 @@
-[cw].[DelayAuthorizedBatches] (
+no[cw].[DelayAuthorizedBatches] (
     [Id]                INT           IDENTITY (1, 1) NOT NULL,
     [ProcessBatchId]    INT           NOT NULL,
     [UserId]            INT           NOT NULL,
@@ -50,3 +50,6 @@ BEGIN
         OperationStatusId = @OperationStatusId
     WHERE ProcessBatchId = @ProcessBatchId;
 END
+
+
+{“companyId”:115631,“usser”:“9000010018018018”,“password”:“LocalPayment2023”,“documentNumber”:“1080000”,“documentType”:“Q”,“documentExtension”:“SN”,“documentComplement”:“”,“amount”:1.5,“currency”:“BOL”,“fundSource”:“PayOut LP”,“fundDestination”:“PayOut LP”,“sourceAccount”:“7015095588321",“sourceCurrency”:“BOL”,“description”:“”,“sendVouchers”:“”,“cismartApprovers”:[{“idc”:“6321676-Q-SN”,“type”:1}],“spreadsheet”:{“FormOddPayments”:[],“FormAchPayments”:[{“PaymentType”:“ACH”,“Line”:1,“AccountNumber”:“3554150",“GlossPayment”:“Pago”,“Amount”:1.5,“DocumentType”:“NIT”,“DocumentNumber”:“419326025”,“DocumentExtension”:“”,“FirstDetail”:“”,“SecondDetail”:“”,“TitularName”:“LOCALPAYMENT SRL”,“FirstLastName”:“”,“SecondLastName”:” “,”Mail”:null,“BranchOfficeId”:“201",“BankId”:“046",“Commission”:0.0,“CommissionCurrency”:“”}],“FormProvidersPayments”:[]}}
