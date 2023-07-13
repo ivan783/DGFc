@@ -1,4 +1,4 @@
-milono[cw].[DelayAuthorizedBatches] (
+mimilono[cw].[DelayAuthorizedBatches] (
     [Id]                INT           IDENTITY (1, 1) NOT NULL,
     [ProcessBatchId]    INT           NOT NULL,
     [UserId]            INT           NOT NULL,
@@ -323,6 +323,72 @@ BEGIN
     -- Verificar el número total de filas actualizadas
     DECLARE @TotalRowsUpdated INT;
     SELECT @TotalRowsUpdated = (SELECT SUM(RowCount) FROM @UpdateAuthorizedBatches) + (SELECT SUM(RowCount) FROM @UpdateDelayAuthorizedBatches) + (SELECT SUM(RowCount) FROM @UpdateProcessBatches);
+
+    -- Verificar si se realizaron actualizaciones
+    IF @TotalRowsUpdated > 0
+    BEGIN
+        SELECT 'Actualizaciones exitosas. Total de filas actualizadas: ' + CAST(@TotalRowsUpdated AS NVARCHAR(MAX)) AS Resultado;
+    END
+    ELSE
+    BEGIN
+        SELECT 'No se encontraron registros para actualizar.' AS Resultado;
+    END
+END
+GO
+
+
+
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpUpdateBatches] ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpUpdateBatches]
+(
+    @ProcessBatchId INT,
+    @IsSend BIT,
+    @OperationStatusId INT,
+    @DateModification DATETIME
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Minimizar operaciones de E/S
+    DECLARE @UpdateAuthorizedBatches INT;
+    DECLARE @UpdateDelayAuthorizedBatches INT;
+    DECLARE @UpdateProcessBatches INT;
+
+    -- Actualizar AuthorizedBatches
+    UPDATE [cw].[AuthorizedBatches]
+    SET OperationStatusId = @OperationStatusId
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    SET @UpdateAuthorizedBatches = @@ROWCOUNT;
+
+    -- Actualizar DelayAuthorizedBatches
+    UPDATE [cw].[DelayAuthorizedBatches]
+    SET IsSend = @IsSend,
+        DateModification = @DateModification
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    SET @UpdateDelayAuthorizedBatches = @@ROWCOUNT;
+
+    -- Actualizar ProcessBatches
+    UPDATE [cw].[ProcessBatches]
+    SET OperationStatusId = @OperationStatusId
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    SET @UpdateProcessBatches = @@ROWCOUNT;
+
+    -- Verificar el número total de filas actualizadas
+    DECLARE @TotalRowsUpdated INT;
+    SET @TotalRowsUpdated = @UpdateAuthorizedBatches + @UpdateDelayAuthorizedBatches + @UpdateProcessBatches;
 
     -- Verificar si se realizaron actualizaciones
     IF @TotalRowsUpdated > 0
