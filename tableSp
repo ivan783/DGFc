@@ -1,4 +1,4 @@
-no[cw].[DelayAuthorizedBatches] (
+lono[cw].[DelayAuthorizedBatches] (
     [Id]                INT           IDENTITY (1, 1) NOT NULL,
     [ProcessBatchId]    INT           NOT NULL,
     [UserId]            INT           NOT NULL,
@@ -127,5 +127,52 @@ BEGIN
     SET OperationStatusId = @OperationStatusId
     WHERE ProcessBatchId = @ProcessBatchId;
 	select @@ROWCOUNT
+END
+GO
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpUpdateBatches] ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpUpdateBatches]
+(
+    @ProcessBatchId INT,
+    @OperationStatusId INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Actualizar AuthorizedBatches
+    IF EXISTS (SELECT 1 FROM [cw].[AuthorizedBatches] WHERE ProcessBatchId = @ProcessBatchId)
+    BEGIN
+        UPDATE [cw].[AuthorizedBatches]
+        SET OperationStatusId = @OperationStatusId
+        WHERE ProcessBatchId = @ProcessBatchId;
+        SELECT @@ROWCOUNT;
+    END
+
+    -- Actualizar DelayAuthorizedBatches
+    IF EXISTS (SELECT 1 FROM [cw].[DelayAuthorizedBatches] WHERE ProcessBatchId = @ProcessBatchId)
+    BEGIN
+        UPDATE [cw].[DelayAuthorizedBatches]
+        SET OperationStatusId = @OperationStatusId
+        WHERE ProcessBatchId = @ProcessBatchId;
+        SELECT @@ROWCOUNT;
+    END
+
+    -- Actualizar ProcessBatches
+    IF EXISTS (SELECT 1 FROM [cw].[ProcessBatches] WHERE ProcessBatchId = @ProcessBatchId)
+    BEGIN
+        UPDATE [cw].[ProcessBatches]
+        SET OperationStatusId = @OperationStatusId
+        WHERE ProcessBatchId = @ProcessBatchId;
+        SELECT @@ROWCOUNT;
+    END
 END
 GO
