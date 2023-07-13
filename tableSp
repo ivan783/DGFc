@@ -273,3 +273,65 @@ BEGIN
     END CATCH;
 END
 GO
+
+
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpUpdateBatches] ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpUpdateBatches]
+(
+    @ProcessBatchId INT,
+    @IsSend BIT,
+    @OperationStatusId INT,
+    @DateModification DATETIME
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Minimizar operaciones de E/S
+    DECLARE @UpdateAuthorizedBatches TABLE (RowCount INT);
+    DECLARE @UpdateDelayAuthorizedBatches TABLE (RowCount INT);
+    DECLARE @UpdateProcessBatches TABLE (RowCount INT);
+
+    -- Actualizar AuthorizedBatches
+    UPDATE [cw].[AuthorizedBatches]
+    SET OperationStatusId = @OperationStatusId
+    OUTPUT @@ROWCOUNT INTO @UpdateAuthorizedBatches
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    -- Actualizar DelayAuthorizedBatches
+    UPDATE [cw].[DelayAuthorizedBatches]
+    SET IsSend = @IsSend,
+        DateModification = @DateModification
+    OUTPUT @@ROWCOUNT INTO @UpdateDelayAuthorizedBatches
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    -- Actualizar ProcessBatches
+    UPDATE [cw].[ProcessBatches]
+    SET OperationStatusId = @OperationStatusId
+    OUTPUT @@ROWCOUNT INTO @UpdateProcessBatches
+    WHERE ProcessBatchId = @ProcessBatchId;
+
+    -- Verificar el número total de filas actualizadas
+    DECLARE @TotalRowsUpdated INT;
+    SELECT @TotalRowsUpdated = (SELECT SUM(RowCount) FROM @UpdateAuthorizedBatches) + (SELECT SUM(RowCount) FROM @UpdateDelayAuthorizedBatches) + (SELECT SUM(RowCount) FROM @UpdateProcessBatches);
+
+    -- Verificar si se realizaron actualizaciones
+    IF @TotalRowsUpdated > 0
+    BEGIN
+        SELECT 'Actualizaciones exitosas. Total de filas actualizadas: ' + CAST(@TotalRowsUpdated AS NVARCHAR(MAX)) AS Resultado;
+    END
+    ELSE
+    BEGIN
+        SELECT 'No se encontraron registros para actualizar.' AS Resultado;
+    END
+END
+GO
