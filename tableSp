@@ -1,4 +1,4 @@
-lono[cw].[DelayAuthorizedBatches] (
+milono[cw].[DelayAuthorizedBatches] (
     [Id]                INT           IDENTITY (1, 1) NOT NULL,
     [ProcessBatchId]    INT           NOT NULL,
     [UserId]            INT           NOT NULL,
@@ -222,5 +222,54 @@ BEGIN
         WHERE ProcessBatchId = @ProcessBatchId;
         SELECT @@ROWCOUNT;
     END
+END
+GO
+USE [BD_CREDINET]
+GO
+
+/****** Object: StoredProcedure [cw].[SpUpdateBatches] ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [cw].[SpUpdateBatches]
+(
+    @ProcessBatchId INT,
+    @IsSend BIT,
+    @OperationStatusId INT,
+    @DateModification DATETIME
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Actualizar DelayAuthorizedBatches
+        UPDATE [cw].[DelayAuthorizedBatches]
+        SET IsSend = @IsSend,
+            DateModification = @DateModification
+        WHERE ProcessBatchId = @ProcessBatchId;
+
+        -- Actualizar AuthorizedBatches
+        UPDATE [cw].[AuthorizedBatches]
+        SET OperationStatusId = @OperationStatusId
+        WHERE ProcessBatchId = @ProcessBatchId;
+
+        -- Actualizar ProcessBatches
+        UPDATE [cw].[ProcessBatches]
+        SET OperationStatusId = @OperationStatusId
+        WHERE ProcessBatchId = @ProcessBatchId;
+
+        COMMIT;
+        SELECT 'Actualizaciones exitosas.' AS Resultado;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        SELECT 'Error en las actualizaciones. Se ha realizado un rollback.' AS Resultado;
+    END CATCH;
 END
 GO
