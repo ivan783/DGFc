@@ -1,0 +1,71 @@
+public async Task<Result<List<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto)
+        {
+            var appUserId = configuration["Connectors:ApiQR:AppUserId"];
+            var publicToken = configuration["Connectors:ApiQR:PublicToken"];
+            var channel = configuration["Connectors:ApiQR:Channel"];
+            var url = configuration["Connectors:ApiQR:AddressRegUsers"];
+
+            var results = new Result<List<GetRegUserQRResponse>>();
+
+            foreach (var user in dto.ClientResponseUser)
+            {
+                var request = new GetRegUserQRRequest
+                {
+                    AppUserId = appUserId,
+                    PublicToken = publicToken,
+                    Channel = channel,
+                    BusinessCode = dto.businessCode,
+                    TypeUser = "CW",
+                    RoleCode = user.roleCode,
+                    Device = new Device
+                    {
+                        Id = "01",
+                        Type = "PC",
+                        Name = "PC T",
+                        Os = "Windows 10"
+                    },
+                    Client = new Client
+                    {
+                        Name = user.name,
+                        Password = EncryptDecrypt(true, user.password),
+                        UserName = user.userName,
+                        Email = user.email,
+                        DocumentComplement = string.IsNullOrEmpty(user.documentComplement) ? "00" : user.documentComplement,
+                        DocumentExtension = string.IsNullOrEmpty(user.documentExtension) ? "00" : user.documentExtension,
+                        DocumentNumber = user.documentNumber,
+                        DocumentType = GetUserQRDocumentType(user.documentType),
+                        Cellphone = user.cellphone,
+                        //RoleCode = user.roleCode,
+                        PasswordExpirationDate = DateTime.Now.ToString()
+                    }
+                };
+
+                try
+                {
+                    var response = await Task.Run(() => this.manager.SaveRegUserQR(request, url));
+                    if (response.State == "00")
+                    {
+                        logger.LogInformation($"Registro correcto UserIdQR: {response.Data.Client.Id}");
+                        InsertarRegistro(0, companyId, 0, response.Data.Client.Id, request.RoleCode, user.typeUser, request.Client.Name, response.Data.Client.UserName, response.Data.Client.Token.ToString(), request.Client.Password, request.Client.Email, request.Client.Cellphone, request.Client.DocumentNumber, request.Client.DocumentType, request.Client.DocumentExtension, request.Client.DocumentComplement, "Migra", "migra", DateTime.Now, DateTime.Now, DateTime.Now, false);
+                    }
+                    else
+                    {
+                        var aux = JsonConvert.SerializeObject(request);
+                        logger.LogError($"User req err QRPayment: {aux}");
+
+                        var aux1 = JsonConvert.SerializeObject(request);
+                        logger.LogError($"User resp err QRPayment Mensaje: {response?.Message} ------Estado: {response?.State}");
+
+                        Result<GetRegUserQRResponse>.SetError($"Error al registrar Usuario Api QR {user.name}");
+                    }
+                    results.Add(Result<List<GetRegUserQRResponse>>.SetOk(response));
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Error al registrar Usuario QR para el usuario {user.name}");
+                    results.Add(Result<List<GetRegUserQRResponse>>.SetError($"Error al registrar Usuario QR para el usuario {user.name}"));
+                }
+            }
+
+            return results;
+        }
