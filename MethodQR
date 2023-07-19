@@ -69,3 +69,88 @@ public async Task<Result<List<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto
 
             return results;
         }
+public async Task<Result<List<GetRegUserQRResponse>>> RegUsers(ReqRegUserDto dto)
+{
+    // Obtener las configuraciones necesarias
+    var appUserId = configuration["Connectors:ApiQR:AppUserId"];
+    var publicToken = configuration["Connectors:ApiQR:PublicToken"];
+    var channel = configuration["Connectors:ApiQR:Channel"];
+    var url = configuration["Connectors:ApiQR:AddressRegUsers"];
+
+    // Crear una lista de resultados para almacenar los resultados del registro de usuarios
+    var results = new Result<List<GetRegUserQRResponse>>();
+
+    // Iterar a través de los usuarios proporcionados en el objeto dto
+    foreach (var user in dto.ClientResponseUser)
+    {
+        // Crear una solicitud para registrar al usuario usando la API QR
+        var request = new GetRegUserQRRequest
+        {
+            // Configuraciones y datos del usuario
+            AppUserId = appUserId,
+            PublicToken = publicToken,
+            Channel = channel,
+            BusinessCode = dto.businessCode,
+            TypeUser = "CW",
+            RoleCode = user.roleCode,
+            Device = new Device
+            {
+                Id = "01",
+                Type = "PC",
+                Name = "PC T",
+                Os = "Windows 10"
+            },
+            Client = new Client
+            {
+                Name = user.name,
+                Password = EncryptDecrypt(true, user.password),
+                UserName = user.userName,
+                Email = user.email,
+                DocumentComplement = string.IsNullOrEmpty(user.documentComplement) ? "00" : user.documentComplement,
+                DocumentExtension = string.IsNullOrEmpty(user.documentExtension) ? "00" : user.documentExtension,
+                DocumentNumber = user.documentNumber,
+                DocumentType = GetUserQRDocumentType(user.documentType),
+                Cellphone = user.cellphone,
+                PasswordExpirationDate = DateTime.Now.ToString()
+            }
+        };
+
+        try
+        {
+            // Ejecutar la solicitud asincrónica para guardar al usuario usando la API QR
+            var response = await Task.Run(() => this.manager.SaveRegUserQR(request, url));
+
+            // Comprobar el estado de la respuesta
+            if (response.State == "00")
+            {
+                // Registro exitoso, realizar acciones adicionales si es necesario
+                logger.LogInformation($"Registro correcto UserIdQR: {response.Data.Client.Id}");
+                InsertarRegistro(0, companyId, 0, response.Data.Client.Id, request.RoleCode, user.typeUser, request.Client.Name, response.Data.Client.UserName, response.Data.Client.Token.ToString(), request.Client.Password, request.Client.Email, request.Client.Cellphone, request.Client.DocumentNumber, request.Client.DocumentType, request.Client.DocumentExtension, request.Client.DocumentComplement, "Migra", "migra", DateTime.Now, DateTime.Now, DateTime.Now, false);
+            }
+            else
+            {
+                // Registro fallido, registrar información de error y continuar con el siguiente usuario
+                var aux = JsonConvert.SerializeObject(request);
+                logger.LogError($"User req err QRPayment: {aux}");
+
+                var aux1 = JsonConvert.SerializeObject(request);
+                logger.LogError($"User resp err QRPayment Mensaje: {response?.Message} ------Estado: {response?.State}");
+
+                // Agregar un error al resultado
+                Result<GetRegUserQRResponse>.SetError($"Error al registrar Usuario Api QR {user.name}");
+            }
+
+            // Agregar el resultado a la lista de resultados exitosos
+            results.Add(Result<List<GetRegUserQRResponse>>.SetOk(response));
+        }
+        catch (Exception ex)
+        {
+            // Si ocurre una excepción, registrar el error y continuar con el siguiente usuario
+            logger.LogError(ex, $"Error al registrar Usuario QR para el usuario {user.name}");
+            results.Add(Result<List<GetRegUserQRResponse>>.SetError($"Error al registrar Usuario QR para el usuario {user.name}"));
+        }
+    }
+
+    // Devolver la lista de resultados de registro de usuarios
+    return results;
+}
