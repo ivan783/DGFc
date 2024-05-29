@@ -1,0 +1,39 @@
+{
+  "companyId": 2295,
+  "password": "pato123AB",
+  "documentNumber": "4850147",
+  "documentType": "Q",
+  "documentExtension": "LP",
+  "documentComplement": " ",
+  "amount": 388,
+  "currency": "BOL",
+  "fundSource": "PRUEBA",
+  "fundDestination": "PRUEBA",
+  "sourceAccount": "2011040905323",
+  "sourceCurrency": "BOL",
+  "description": "PRUEBA",
+  "sendVouchers": "prueba@gmail.com",
+  "cismartApprovers": [
+    {
+      "idc": "00255921-Q-LP 1A",
+      "type": 1
+    }
+  ],
+  "spreadsheet": {
+    "formAchPayments": [
+      {
+        "paymentType": "ACH",
+        "line": 1,
+        "accountNumber": "4867400015",
+        "titularName": "TUMOMO SRL",
+        "firstLastName": "TUMOMO SRL",
+        "secondLastName": " ",
+        "amount": 388,
+        "branchOfficeId": 0,
+        "firstDetail": "Detalle 1",
+        "mail": "fernandol@sintesis.com.bo",
+        "bankId": "1014"
+      }
+    ]
+  }
+}
