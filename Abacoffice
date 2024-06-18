@@ -22,3 +22,108 @@ public Result<AccountByIdResult> GetAccountById(AccountByIdDto dto)
     
     return Result<AccountByIdResult>.SetError("El número de cuenta seleccionado no es válido o no existe");
 }
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models
+{
+    public class Data
+    {
+        public string? accountNumber { get; set; }
+        public string? accountHolder { get; set; }
+        public string? accountType { get; set; }
+        public string? accountTypeDescription { get; set; }
+        public string? accountTypeCode { get; set; }
+        public string? accountTypeCodeDescription { get; set; }
+        public string? currency { get; set; }
+        public string? currencyDescription { get; set; }
+        public string? status { get; set; }
+        public string? statusDescription { get; set; }
+        public double availableBalance { get; set; }
+        public double countableBalance { get; set; }
+        public string? cic { get; set; }
+        public string? traceBizTalk { get; set; }
+        public string? savingsType { get; set; }
+        public string? savingsTypeDescription { get; set; }
+        public string? lockType { get; set; }
+        public string? lockTypeDescription { get; set; }
+        public string? openingDate { get; set; }
+        public List<Movement>? movements { get; set; }
+    }
+
+    public class Movement
+    {
+        public string? date { get; set; }
+        public string? valuta { get; set; }
+        public string? gloss { get; set; }
+        public double amount { get; set; }
+        public string? agencyBranch { get; set; }
+        public string? user { get; set; }
+        public string? hostOperationNumber { get; set; }
+        public object? detail { get; set; }
+    }
+
+    public class ResponseCteAhoMovements
+    {
+        public Data? data { get; set; }
+        public string? state { get; set; }
+        public string? message { get; set; }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models
+{
+    public class Data
+    {
+        public string? accountNumber { get; set; }
+        public string? accountHolder { get; set; }
+        public string? accountType { get; set; }
+        public string? accountTypeDescription { get; set; }
+        public string? currency { get; set; }
+        public string? currencyDescription { get; set; }
+        public string? status { get; set; }
+        public string? statusDescription { get; set; }
+        public double availableBalance { get; set; }
+        public double countableBalance { get; set; }
+        public string? cic { get; set; }
+        public string? traceBizTalk { get; set; }
+        public List<LastMovement>? lastMovements { get; set; }
+    }
+
+    public class LastMovement
+    {
+        public string? date { get; set; }
+        public string? valuta { get; set; }
+        public string? reference { get; set; }
+        public double amount { get; set; }
+        public string? agencyBranch { get; set; }
+        public string? user { get; set; }
+        public string? transactionNumber { get; set; }
+        public object? detailId { get; set; }
+    }
+
+    public class ResponseCteMovements
+    {
+        public Data? data { get; set; }
+        public string? state { get; set; }
+        public string? message { get; set; }
+    }
+
+}
+
+Severity	Code	Description	Project	File	Line	Suppression State
+Error	CS0101	The namespace 'BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models' already contains a definition for 'Data'	BalancesAndMovements.Business	D:\Services2024\Clones_version_check\New_2024\CW_MOVEMENTS_V2_WES\Functions\BalancesAndMovements\BalancesAndMovements.Business\Models\ResponseCteAhoMovements.cs	9	Active
+Severity	Code	Description	Project	File	Line	Suppression State
+Error	CS0101	The namespace 'BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models' already contains a definition for 'Data'	BalancesAndMovements.Business	D:\Services2024\Clones_version_check\New_2024\CW_MOVEMENTS_V2_WES\Functions\BalancesAndMovements\BalancesAndMovements.Business\Models\ResponseCteAhoMovements.cs	9	Active
