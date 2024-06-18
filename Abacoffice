@@ -127,3 +127,91 @@ Severity	Code	Description	Project	File	Line	Suppression State
 Error	CS0101	The namespace 'BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models' already contains a definition for 'Data'	BalancesAndMovements.Business	D:\Services2024\Clones_version_check\New_2024\CW_MOVEMENTS_V2_WES\Functions\BalancesAndMovements\BalancesAndMovements.Business\Models\ResponseCteAhoMovements.cs	9	Active
 Severity	Code	Description	Project	File	Line	Suppression State
 Error	CS0101	The namespace 'BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models' already contains a definition for 'Data'	BalancesAndMovements.Business	D:\Services2024\Clones_version_check\New_2024\CW_MOVEMENTS_V2_WES\Functions\BalancesAndMovements\BalancesAndMovements.Business\Models\ResponseCteAhoMovements.cs	9	Active
+
+
+using System;
+using System.Collections.Generic;
+
+namespace BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models.Common
+{
+    public class BaseData
+    {
+        public string? AccountNumber { get; set; }
+        public string? AccountHolder { get; set; }
+        public string? AccountType { get; set; }
+        public string? AccountTypeDescription { get; set; }
+        public string? Currency { get; set; }
+        public string? CurrencyDescription { get; set; }
+        public string? Status { get; set; }
+        public string? StatusDescription { get; set; }
+        public double AvailableBalance { get; set; }
+        public double CountableBalance { get; set; }
+        public string? Cic { get; set; }
+        public string? TraceBizTalk { get; set; }
+    }
+
+    public class Movement
+    {
+        public string? Date { get; set; }
+        public string? Valuta { get; set; }
+        public string? Gloss { get; set; }
+        public double Amount { get; set; }
+        public string? AgencyBranch { get; set; }
+        public string? User { get; set; }
+        public string? HostOperationNumber { get; set; }
+        public object? Detail { get; set; }
+    }
+
+    public class LastMovement
+    {
+        public string? Date { get; set; }
+        public string? Valuta { get; set; }
+        public string? Reference { get; set; }
+        public double Amount { get; set; }
+        public string? AgencyBranch { get; set; }
+        public string? User { get; set; }
+        public string? TransactionNumber { get; set; }
+        public object? DetailId { get; set; }
+    }
+}
+
+namespace BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models.Aho
+{
+    using BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models.Common;
+
+    public class DataAhoMovements : BaseData
+    {
+        public string? AccountTypeCode { get; set; }
+        public string? AccountTypeCodeDescription { get; set; }
+        public string? SavingsType { get; set; }
+        public string? SavingsTypeDescription { get; set; }
+        public string? LockType { get; set; }
+        public string? LockTypeDescription { get; set; }
+        public string? OpeningDate { get; set; }
+        public List<Movement>? Movements { get; set; }
+    }
+
+    public class ResponseCteAhoMovements
+    {
+        public DataAhoMovements? Data { get; set; }
+        public string? State { get; set; }
+        public string? Message { get; set; }
+    }
+}
+
+namespace BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models.Cte
+{
+    using BCP.CredinetWeb.Functions.BalancesAndMovements.Business.Models.Common;
+
+    public class DataCteMovements : BaseData
+    {
+        public List<LastMovement>? LastMovements { get; set; }
+    }
+
+    public class ResponseCteMovements
+    {
+        public DataCteMovements? Data { get; set; }
+        public string? State { get; set; }
+        public string? Message { get; set; }
+    }
+}
